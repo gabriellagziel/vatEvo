@@ -1,0 +1,209 @@
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from typing import List
+import uuid
+from decimal import Decimal
+
+from .database import SessionLocal, engine, get_db
+from .models import Base, Tenant, Invoice, InvoiceStatus
+from .schemas import (
+    InvoiceCreate, InvoiceResponse, InvoiceValidateRequest, 
+    ValidationResult, TenantCreate, TenantResponse
+)
+from .auth import get_current_tenant
+from .compliance import validate_invoice_data, generate_ubl_xml
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="Vatevo API",
+    description="Compliance-as-a-Service for EU e-invoicing",
+    version="1.0.0"
+)
+
+# Disable CORS. Do not remove this for full-stack development.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok", "service": "vatevo-api"}
+
+
+@app.post("/tenants", response_model=TenantResponse)
+async def create_tenant(tenant_data: TenantCreate, db: Session = Depends(get_db)):
+    """Create a new tenant with API key"""
+    api_key = f"vat_{uuid.uuid4().hex}"
+    
+    tenant = Tenant(
+        name=tenant_data.name,
+        api_key=api_key,
+        webhook_url=tenant_data.webhook_url
+    )
+    
+    db.add(tenant)
+    db.commit()
+    db.refresh(tenant)
+    
+    return tenant
+
+
+@app.post("/invoices", response_model=InvoiceResponse)
+async def create_invoice(
+    invoice_data: InvoiceCreate,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Create and optionally submit an invoice"""
+    
+    subtotal = Decimal("0")
+    tax_total = Decimal("0")
+    
+    for item in invoice_data.line_items:
+        subtotal += Decimal(item.line_total)
+        tax_total += Decimal(item.tax_amount)
+    
+    total = subtotal + tax_total
+    
+    invoice = Invoice(
+        external_id=invoice_data.external_id,
+        tenant_id=current_tenant.id,
+        country_code=invoice_data.country_code,
+        invoice_number=invoice_data.invoice_number,
+        issue_date=invoice_data.issue_date,
+        due_date=invoice_data.due_date,
+        subtotal=str(subtotal),
+        tax_amount=str(tax_total),
+        total_amount=str(total),
+        currency=invoice_data.currency,
+        supplier_data=invoice_data.supplier.dict(),
+        customer_data=invoice_data.customer.dict(),
+        line_items=[item.dict() for item in invoice_data.line_items],
+        status=InvoiceStatus.DRAFT
+    )
+    
+    db.add(invoice)
+    db.commit()
+    db.refresh(invoice)
+    
+    try:
+        ubl_xml = generate_ubl_xml(invoice)
+        invoice.ubl_xml = ubl_xml
+        invoice.status = InvoiceStatus.VALIDATED
+        
+        if invoice_data.submit_immediately:
+            invoice.status = InvoiceStatus.SUBMITTED
+            
+        db.commit()
+        db.refresh(invoice)
+        
+    except Exception as e:
+        invoice.status = InvoiceStatus.FAILED
+        invoice.error_message = str(e)
+        db.commit()
+        db.refresh(invoice)
+    
+    return invoice
+
+
+@app.get("/invoices/{invoice_id}", response_model=InvoiceResponse)
+async def get_invoice(
+    invoice_id: int,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Get invoice details"""
+    invoice = db.query(Invoice).filter(
+        Invoice.id == invoice_id,
+        Invoice.tenant_id == current_tenant.id
+    ).first()
+    
+    if not invoice:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invoice not found"
+        )
+    
+    return invoice
+
+
+@app.get("/invoices", response_model=List[InvoiceResponse])
+async def list_invoices(
+    skip: int = 0,
+    limit: int = 100,
+    status: InvoiceStatus = None,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """List invoices for the current tenant"""
+    query = db.query(Invoice).filter(Invoice.tenant_id == current_tenant.id)
+    
+    if status:
+        query = query.filter(Invoice.status == status)
+    
+    invoices = query.offset(skip).limit(limit).all()
+    return invoices
+
+
+@app.post("/invoices/{invoice_id}/retry", response_model=InvoiceResponse)
+async def retry_invoice(
+    invoice_id: int,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Retry a failed invoice submission"""
+    invoice = db.query(Invoice).filter(
+        Invoice.id == invoice_id,
+        Invoice.tenant_id == current_tenant.id
+    ).first()
+    
+    if not invoice:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invoice not found"
+        )
+    
+    if invoice.status not in [InvoiceStatus.FAILED, InvoiceStatus.REJECTED]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only failed or rejected invoices can be retried"
+        )
+    
+    try:
+        ubl_xml = generate_ubl_xml(invoice)
+        invoice.ubl_xml = ubl_xml
+        invoice.status = InvoiceStatus.VALIDATED
+        invoice.error_message = None
+        
+        db.commit()
+        db.refresh(invoice)
+        
+    except Exception as e:
+        invoice.status = InvoiceStatus.FAILED
+        invoice.error_message = str(e)
+        db.commit()
+        db.refresh(invoice)
+    
+    return invoice
+
+
+@app.post("/validate", response_model=ValidationResult)
+async def validate_invoice(
+    validation_data: InvoiceValidateRequest,
+    current_tenant: Tenant = Depends(get_current_tenant)
+):
+    """Validate invoice data without creating an invoice"""
+    try:
+        result = validate_invoice_data(validation_data)
+        return result
+    except Exception as e:
+        return ValidationResult(
+            valid=False,
+            errors=[f"Validation error: {str(e)}"]
+        )
