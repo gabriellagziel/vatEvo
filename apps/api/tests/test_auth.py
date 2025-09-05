@@ -8,7 +8,7 @@ class TestAuthFunctions:
     def test_create_api_key(self):
         api_key = create_api_key()
         assert api_key.startswith("vat_")
-        assert len(api_key) == 35  # "vat_" + 32 character hex string
+        assert len(api_key) == 36  # "vat_" + 32 character hex string
 
     def test_create_api_key_uniqueness(self):
         key1 = create_api_key()

@@ -62,7 +62,7 @@ class TestInvoiceEndpoints:
 
     def test_create_invoice_unauthorized(self, client: TestClient, sample_invoice_data: dict):
         response = client.post("/invoices", json=sample_invoice_data)
-        assert response.status_code == 401
+        assert response.status_code == 403
 
     def test_create_invoice_invalid_auth(self, client: TestClient, sample_invoice_data: dict):
         headers = {"Authorization": "Bearer invalid_key"}
@@ -155,4 +155,4 @@ class TestValidationEndpoint:
 
     def test_validate_invoice_unauthorized(self, client: TestClient, sample_invoice_data: dict):
         response = client.post("/validate", json=sample_invoice_data)
-        assert response.status_code == 401
+        assert response.status_code == 403

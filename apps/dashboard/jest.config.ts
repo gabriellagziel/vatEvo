@@ -1,6 +1,4 @@
-import type { Config } from 'jest'
-
-const config: Config = {
+const config = {
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
@@ -19,4 +17,4 @@ const config: Config = {
   ],
 }
 
-export default config
+module.exports = config
