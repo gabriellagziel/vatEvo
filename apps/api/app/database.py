@@ -3,12 +3,25 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from .config import settings
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./vatevo.db"
+# Use effective database URL from settings
+SQLALCHEMY_DATABASE_URL = settings.effective_database_url
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
-    connect_args={"check_same_thread": False}  # Only needed for SQLite
-)
+# Configure engine based on database type
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    # SQLite configuration (local development)
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
+else:
+    # PostgreSQL configuration (staging/production)
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        pool_size=settings.db_pool_size,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        connect_args={"sslmode": settings.db_ssl_mode}
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

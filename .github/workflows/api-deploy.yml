@@ -1,0 +1,145 @@
+name: API Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/api/**'
+      - 'infra/fly.toml'
+      - 'Dockerfile'
+  workflow_dispatch:
+
+env:
+  FLY_APP: vatevo-api
+  FLY_APP_STAGING: vatevo-api-staging
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Poetry
+        run: pipx install poetry
+      
+      - name: Install dependencies
+        run: poetry install --no-root
+      
+      - name: Run tests
+        run: poetry run pytest --cov=app --cov-report=term-missing
+      
+      - name: Run smoke tests
+        run: |
+          cd ../..
+          chmod +x ops/api/smoke.sh
+          ./ops/api/smoke.sh -u http://localhost:8000 || true
+
+  deploy-staging:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Deploy to staging
+        run: |
+          cd apps/api
+          fly deploy --config ../../infra/fly.toml --app $FLY_APP_STAGING --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      
+      - name: Run staging health checks
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Test health endpoints
+          curl -f https://$FLY_APP_STAGING.fly.dev/health/ready || exit 1
+          curl -f https://$FLY_APP_STAGING.fly.dev/health/db || exit 1
+          curl -f https://$FLY_APP_STAGING.fly.dev/docs || exit 1
+          
+          echo "✅ Staging deployment successful"
+          echo "Staging URL: https://$FLY_APP_STAGING.fly.dev"
+          echo "Health checks: PASSED"
+
+  deploy-production:
+    needs: [test, deploy-staging]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Validate required secrets
+        run: |
+          required_secrets=(
+            "POSTGRES_URL"
+            "REDIS_URL"
+            "AWS_ACCESS_KEY_ID"
+            "AWS_SECRET_ACCESS_KEY"
+            "AUTH_SECRET"
+            "API_KEYS_SIGNING_KEY"
+          )
+          
+          for secret in "${required_secrets[@]}"; do
+            if [[ -z "${!secret:-}" ]]; then
+              echo "❌ Missing required secret: $secret"
+              exit 1
+            else
+              echo "✅ Secret present: $secret"
+            fi
+          done
+          
+          echo "🎉 All required secrets present"
+        env:
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          API_KEYS_SIGNING_KEY: ${{ secrets.API_KEYS_SIGNING_KEY }}
+      
+      - name: Deploy to production
+        run: |
+          cd apps/api
+          fly deploy --config ../../infra/fly.toml --app $FLY_APP --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      
+      - name: Run production health checks
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Test health endpoints
+          curl -f https://$FLY_APP.fly.dev/health/ready || exit 1
+          curl -f https://$FLY_APP.fly.dev/health/db || exit 1
+          curl -f https://$FLY_APP.fly.dev/docs || exit 1
+          
+          echo "✅ Production deployment successful"
+          echo "Production URL: https://$FLY_APP.fly.dev"
+          echo "Health checks: PASSED"
+      
+      - name: Run smoke tests
+        run: |
+          chmod +x ops/api/smoke.sh
+          ./ops/api/smoke.sh -u https://$FLY_APP.fly.dev

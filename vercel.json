@@ -1,0 +1,89 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/marketing/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    },
+    {
+      "src": "apps/dashboard/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "distDir": ".next"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "apps/marketing"
+    },
+    {
+      "src": "/dashboard/(.*)",
+      "dest": "apps/dashboard/dashboard/$1"
+    },
+    {
+      "src": "/docs/(.*)",
+      "dest": "https://app-ezgnqzzi.fly.dev/docs/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/www/(.*)",
+      "destination": "https://vatevo.com/$1",
+      "permanent": true
+    }
+  ],
+  "functions": {
+    "apps/marketing/src/app/api/lead/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}

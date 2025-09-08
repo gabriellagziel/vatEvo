@@ -36,6 +36,32 @@ async def healthz():
     return {"status": "ok", "service": "vatevo-api"}
 
 
+@app.get("/health/ready")
+async def health_ready():
+    """Readiness probe - checks if the service is ready to accept traffic"""
+    return {"status": "ready", "service": "vatevo-api"}
+
+
+@app.get("/health/live")
+async def health_live():
+    """Liveness probe - checks if the service is alive"""
+    return {"status": "alive", "service": "vatevo-api"}
+
+
+@app.get("/health/db")
+async def health_db(db: Session = Depends(get_db)):
+    """Database health check - verifies database connectivity"""
+    try:
+        # Test database connection with a simple query
+        db.execute("SELECT 1")
+        return {"status": "ok", "database": "connected"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Database connection failed: {str(e)}"
+        )
+
+
 @app.post("/tenants", response_model=TenantResponse)
 async def create_tenant(tenant_data: TenantCreate, db: Session = Depends(get_db)):
     """Create a new tenant with API key"""
