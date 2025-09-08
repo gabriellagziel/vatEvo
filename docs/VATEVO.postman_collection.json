@@ -1,0 +1,298 @@
+{
+  "info": {
+    "name": "Vatevo API",
+    "description": "Complete API collection for Vatevo e-invoicing service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{api_key}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://api.vatevo.com",
+      "type": "string"
+    },
+    {
+      "key": "api_key",
+      "value": "your-api-key-here",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Basic Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/healthz",
+              "host": ["{{base_url}}"],
+              "path": ["healthz"]
+            }
+          }
+        },
+        {
+          "name": "Readiness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health/ready",
+              "host": ["{{base_url}}"],
+              "path": ["health", "ready"]
+            }
+          }
+        },
+        {
+          "name": "Database Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health/db",
+              "host": ["{{base_url}}"],
+              "path": ["health", "db"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tenants",
+      "item": [
+        {
+          "name": "Create Tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Tenant\",\n  \"webhook_url\": \"https://your-webhook-url.com/webhook\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tenants",
+              "host": ["{{base_url}}"],
+              "path": ["tenants"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country_code\": \"IT\",\n  \"supplier\": {\n    \"name\": \"Test Supplier\",\n    \"vat_id\": \"IT12345678901\",\n    \"address\": \"Via Roma 1\",\n    \"city\": \"Milano\",\n    \"postal_code\": \"20100\",\n    \"country\": \"IT\"\n  },\n  \"customer\": {\n    \"name\": \"Test Customer\",\n    \"vat_id\": \"IT98765432109\",\n    \"address\": \"Via Milano 2\",\n    \"city\": \"Roma\",\n    \"postal_code\": \"00100\",\n    \"country\": \"IT\"\n  },\n  \"line_items\": [\n    {\n      \"description\": \"Test Item\",\n      \"quantity\": 1,\n      \"unit_price\": \"100.00\",\n      \"tax_rate\": 22.0,\n      \"tax_amount\": \"22.00\",\n      \"line_total\": \"100.00\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/invoices",
+              "host": ["{{base_url}}"],
+              "path": ["invoices"]
+            }
+          }
+        },
+        {
+          "name": "Get Invoice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/invoices/1",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1"]
+            }
+          }
+        },
+        {
+          "name": "List Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/invoices?status=validated&skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["invoices"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "validated"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Retry Invoice",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/invoices/1/retry",
+              "host": ["{{base_url}}"],
+              "path": ["invoices", "1", "retry"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validation",
+      "item": [
+        {
+          "name": "Validate Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country_code\": \"IT\",\n  \"supplier\": {\n    \"name\": \"Test Supplier\",\n    \"vat_id\": \"IT12345678901\",\n    \"address\": \"Via Roma 1\",\n    \"city\": \"Milano\",\n    \"postal_code\": \"20100\",\n    \"country\": \"IT\"\n  },\n  \"customer\": {\n    \"name\": \"Test Customer\",\n    \"vat_id\": \"IT98765432109\",\n    \"address\": \"Via Milano 2\",\n    \"city\": \"Roma\",\n    \"postal_code\": \"00100\",\n    \"country\": \"IT\"\n  },\n  \"line_items\": [\n    {\n      \"description\": \"Test Item\",\n      \"quantity\": 1,\n      \"unit_price\": \"100.00\",\n      \"tax_rate\": 22.0,\n      \"tax_amount\": \"22.00\",\n      \"line_total\": \"100.00\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/validate",
+              "host": ["{{base_url}}"],
+              "path": ["validate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Test Webhook",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/webhooks/test",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks", "test"]
+            }
+          }
+        },
+        {
+          "name": "List Webhook Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/webhooks/events?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks", "events"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify Webhook Signature",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Vatevo-Signature",
+                "value": "v1=abc123def456..."
+              },
+              {
+                "key": "X-Vatevo-Timestamp",
+                "value": "1694260800"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"test\": \"payload\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/webhooks/verify",
+              "host": ["{{base_url}}"],
+              "path": ["webhooks", "verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Documentation",
+      "item": [
+        {
+          "name": "OpenAPI Spec",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/openapi.json",
+              "host": ["{{base_url}}"],
+              "path": ["openapi.json"]
+            }
+          }
+        },
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/docs",
+              "host": ["{{base_url}}"],
+              "path": ["docs"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

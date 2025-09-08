@@ -1,8 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 import uuid
+import logging
+import time
 from decimal import Decimal
 
 from .database import SessionLocal, engine, get_db
@@ -13,13 +15,61 @@ from .schemas import (
 )
 from .auth import get_current_tenant
 from .compliance import validate_invoice_data, generate_ubl_xml
+from .config import settings
+from .webhooks import WebhookSigner, WebhookDelivery, create_webhook_event
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize Sentry if DSN is provided
+if settings.sentry_dsn:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.fastapi import FastApiIntegration
+        from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
+        
+        sentry_sdk.init(
+            dsn=settings.sentry_dsn,
+            integrations=[
+                FastApiIntegration(auto_enabling_instrumentations=False),
+                SqlalchemyIntegration(),
+            ],
+            traces_sample_rate=0.1,
+            environment=settings.environment,
+        )
+        logger.info("Sentry initialized successfully")
+    except ImportError:
+        logger.warning("Sentry SDK not installed, skipping initialization")
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Vatevo API",
     description="Compliance-as-a-Service for EU e-invoicing",
-    version="1.0.0"
+    version="1.0.0",
+    openapi_tags=[
+        {
+            "name": "health",
+            "description": "Health check endpoints"
+        },
+        {
+            "name": "tenants",
+            "description": "Tenant management operations"
+        },
+        {
+            "name": "invoices",
+            "description": "Invoice management and processing"
+        },
+        {
+            "name": "validation",
+            "description": "Invoice validation services"
+        },
+        {
+            "name": "webhooks",
+            "description": "Webhook management and delivery"
+        }
+    ]
 )
 
 # Disable CORS. Do not remove this for full-stack development.
@@ -30,6 +80,38 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers
 )
+
+# Correlation ID middleware
+@app.middleware("http")
+async def add_correlation_id(request: Request, call_next):
+    correlation_id = request.headers.get("X-Correlation-ID", str(uuid.uuid4()))
+    
+    # Add to request state for access in endpoints
+    request.state.correlation_id = correlation_id
+    
+    # Process request
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    
+    # Add correlation ID to response headers
+    response.headers["X-Correlation-ID"] = correlation_id
+    
+    # Log request with correlation ID
+    logger.info(
+        f"Request processed",
+        extra={
+            "correlation_id": correlation_id,
+            "method": request.method,
+            "url": str(request.url),
+            "status_code": response.status_code,
+            "process_time": process_time,
+            "user_agent": request.headers.get("user-agent"),
+            "client_ip": request.client.host if request.client else None,
+        }
+    )
+    
+    return response
 
 @app.get("/healthz")
 async def healthz():
@@ -233,3 +315,82 @@ async def validate_invoice(
             valid=False,
             errors=[f"Validation error: {str(e)}"]
         )
+
+
+# Webhook endpoints
+@app.post("/webhooks/verify")
+async def verify_webhook_signature(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """Verify webhook signature (for testing)"""
+    body = await request.body()
+    signature = request.headers.get("X-Vatevo-Signature", "")
+    timestamp = int(request.headers.get("X-Vatevo-Timestamp", "0"))
+    
+    is_valid = WebhookSigner.verify_signature(
+        body.decode(),
+        signature,
+        settings.webhook_secret,
+        timestamp
+    )
+    
+    return {
+        "valid": is_valid,
+        "timestamp": timestamp,
+        "signature": signature
+    }
+
+
+@app.get("/webhooks/events")
+async def list_webhook_events(
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100
+):
+    """List webhook events for the current tenant"""
+    events = db.query(WebhookEvent).filter(
+        WebhookEvent.tenant_id == current_tenant.id
+    ).offset(skip).limit(limit).all()
+    
+    return events
+
+
+@app.post("/webhooks/test")
+async def test_webhook_delivery(
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Test webhook delivery for the current tenant"""
+    if not current_tenant.webhook_url:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No webhook URL configured for tenant"
+        )
+    
+    # Create test webhook event
+    test_data = {
+        "message": "Test webhook delivery",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+    
+    webhook_event = create_webhook_event(
+        current_tenant.id,
+        "test.webhook",
+        test_data
+    )
+    
+    # Deliver webhook
+    delivery = WebhookDelivery(db)
+    success = delivery.deliver_webhook(
+        current_tenant.id,
+        "test.webhook",
+        webhook_event
+    )
+    
+    return {
+        "success": success,
+        "webhook_url": current_tenant.webhook_url,
+        "event": webhook_event
+    }

@@ -1,0 +1,130 @@
+name: Uptime Monitor
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # Every 5 minutes
+  workflow_dispatch:
+
+jobs:
+  uptime-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check API Health
+        id: api_health
+        run: |
+          echo "Checking API health endpoints..."
+          
+          # Check /health/ready
+          if curl -f --max-time 10 https://api.vatevo.com/health/ready; then
+            echo "✅ API /health/ready: OK"
+            echo "api_ready=ok" >> $GITHUB_OUTPUT
+          else
+            echo "❌ API /health/ready: FAILED"
+            echo "api_ready=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check /health/db
+          if curl -f --max-time 10 https://api.vatevo.com/health/db; then
+            echo "✅ API /health/db: OK"
+            echo "api_db=ok" >> $GITHUB_OUTPUT
+          else
+            echo "❌ API /health/db: FAILED"
+            echo "api_db=failed" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check Web Health
+        id: web_health
+        run: |
+          echo "Checking web endpoints..."
+          
+          # Check marketing site
+          if curl -f --max-time 10 https://vatevo.com/vida; then
+            echo "✅ Marketing /vida: OK"
+            echo "marketing_vida=ok" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Marketing /vida: FAILED"
+            echo "marketing_vida=failed" >> $GITHUB_OUTPUT
+          fi
+          
+          # Check dashboard
+          if curl -f --max-time 10 https://dashboard.vatevo.com; then
+            echo "✅ Dashboard: OK"
+            echo "dashboard=ok" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Dashboard: FAILED"
+            echo "dashboard=failed" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Issue on Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Uptime Alert - ${new Date().toISOString()}`;
+            const body = `
+            ## Uptime Check Failed
+            
+            **Timestamp**: ${new Date().toISOString()}
+            **Workflow**: ${{ github.workflow }}
+            **Run ID**: ${{ github.run_id }}
+            
+            ### Failed Endpoints:
+            - API /health/ready: ${{ steps.api_health.outputs.api_ready }}
+            - API /health/db: ${{ steps.api_health.outputs.api_db }}
+            - Marketing /vida: ${{ steps.web_health.outputs.marketing_vida }}
+            - Dashboard: ${{ steps.web_health.outputs.dashboard }}
+            
+            ### Next Steps:
+            1. Check service logs
+            2. Verify DNS resolution
+            3. Check SSL certificates
+            4. Verify database connectivity
+            
+            ### Monitoring:
+            - [GitHub Actions](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [API Health](https://api.vatevo.com/health/ready)
+            - [Marketing Site](https://vatevo.com/vida)
+            - [Dashboard](https://dashboard.vatevo.com)
+            `;
+            
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'uptime-alert'
+            });
+            
+            const existingIssue = issues.data.find(issue => 
+              issue.title.includes('Uptime Alert') && 
+              issue.created_at > new Date(Date.now() - 30 * 60 * 1000).toISOString() // Last 30 minutes
+            );
+            
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['uptime-alert', 'incident']
+              });
+              console.log('Created new uptime alert issue');
+            } else {
+              console.log('Uptime alert issue already exists, skipping creation');
+            }
+      
+      - name: Update Status
+        run: |
+          echo "## Uptime Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Endpoint | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| API /health/ready | ${{ steps.api_health.outputs.api_ready }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API /health/db | ${{ steps.api_health.outputs.api_db }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Marketing /vida | ${{ steps.web_health.outputs.marketing_vida }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dashboard | ${{ steps.web_health.outputs.dashboard }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,19 @@
+{
+  "name": "vatevo-express-example",
+  "version": "1.0.0",
+  "description": "Express.js example for Vatevo API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@vatevo/sdk": "file:../../sdks/typescript",
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}

@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "development"
     
+    # Observability
+    sentry_dsn: Optional[str] = None
+    log_level: str = "INFO"
+    
     @property
     def effective_database_url(self) -> str:
         """Get the effective database URL, preferring POSTGRES_URL in production."""
