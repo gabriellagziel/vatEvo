@@ -41,6 +41,11 @@ export function Footer() {
         
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>&copy; 2025 Vatevo. All rights reserved.</p>
+          <div className="mt-2 text-xs text-gray-500">
+            Build: {process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'dev'} | 
+            {new Date().toISOString()} | 
+            {process.env.NODE_ENV === 'production' ? 'Production' : 'Development'}
+          </div>
         </div>
       </div>
     </footer>
