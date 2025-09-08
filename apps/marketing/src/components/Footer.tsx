@@ -1,6 +1,16 @@
 import React from "react";
 import Link from "next/link";
 
+const BUILD_SHA =
+  (process.env.VERCEL_GIT_COMMIT_SHA && process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)) ||
+  process.env.NEXT_PUBLIC_GIT_SHA?.slice(0, 7) ||
+  "dev";
+
+const BUILD_TIME = process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toISOString();
+const BUILD_ENV =
+  process.env.VERCEL_ENV ||
+  (process.env.NODE_ENV === "production" ? "Production" : "Development");
+
 export function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
@@ -42,9 +52,7 @@ export function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
           <p>&copy; 2025 Vatevo. All rights reserved.</p>
           <div className="mt-2 text-xs text-gray-500">
-            Build: {process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'dev'} | 
-            {new Date().toISOString()} | 
-            {process.env.NODE_ENV === 'production' ? 'Production' : 'Development'}
+            Build: {BUILD_SHA} | {BUILD_TIME} | {BUILD_ENV}
           </div>
         </div>
       </div>
