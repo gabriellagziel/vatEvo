@@ -32,6 +32,12 @@ export default function Solutions() {
           How It Works
         </h2>
         
+        <div className="mb-10">
+          <p className="text-lg text-gray-700 text-center max-w-5xl mx-auto">
+            Vatevo provides <strong>one API + dashboard</strong> that validates against <strong>EN 16931/UBL 2.1</strong>, generates country‑specific formats (<strong>FatturaPA, XRechnung, Factur‑X</strong>), routes invoices via the correct channels (<strong>SDI, Peppol, PPF/PDP, KSeF</strong>), and supports secure archiving + real‑time webhooks. Coverage expands as national onboarding completes.
+          </p>
+        </div>
+        
         <div className="grid md:grid-cols-5 gap-8 items-center">
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">

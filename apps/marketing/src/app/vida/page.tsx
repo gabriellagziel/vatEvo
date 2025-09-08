@@ -15,16 +15,16 @@ export default function ViDA() {
       
       <div className="prose prose-lg max-w-none">
         <p className="text-xl text-gray-700 mb-8">
-          ViDA = VAT in the Digital Age (adopted March 2025). From <strong>July 1, 2030</strong>, cross‑border B2B e‑invoicing becomes <strong>mandatory</strong> across the EU.
-          From <strong>2025</strong>, member states may enforce domestic e‑invoicing freely.
+          ViDA = VAT in the Digital Age (adopted <strong>March 11, 2025</strong>; published <strong>March 25, 2025</strong>; enters into force <strong>April 2025</strong>). From <strong>July 1, 2030</strong>, <strong>intra-EU cross-border B2B</strong> e‑invoicing becomes mandatory across the EU.
+          From <strong>2025</strong>, EU Member States may mandate <strong>domestic</strong> e‑invoicing freely.
         </p>
         
         <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">Purpose of ViDA</h3>
           <ul className="text-blue-800 space-y-1">
             <li>• Harmonize VAT reporting across EU member states</li>
-            <li>• Reduce VAT fraud (currently €93B annually)</li>
-            <li>• Enable real-time auditing and compliance monitoring</li>
+            <li>• Reduce VAT gap (~€89B annually)</li>
+            <li>• Enable near-real-time compliance monitoring</li>
           </ul>
         </div>
 
@@ -38,7 +38,7 @@ export default function ViDA() {
             <li>• <strong>Fines and penalties</strong> from tax authorities</li>
             <li>• <strong>Blocked payments</strong> from EU customers</li>
             <li>• <strong>Loss of EU market access</strong> for non-compliant vendors</li>
-            <li>• <strong>Mandatory adaptation</strong> before 2026 for SaaS vendors selling into Europe</li>
+            <li>• Many countries mandate earlier (2025–2028); EU-wide cross-border B2B compliance required by <strong>2030</strong></li>
           </ul>
         </div>
 
@@ -59,39 +59,39 @@ export default function ViDA() {
             <tbody>
               <tr className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-4 font-medium">Italy</td>
-                <td className="border border-gray-300 p-4">Full mandatory e‑invoicing</td>
+                <td className="border border-gray-300 p-4">Full B2B/B2C e‑invoicing</td>
                 <td className="border border-gray-300 p-4">Since 2019</td>
-                <td className="border border-gray-300 p-4">FatturaPA XML via SDI</td>
+                <td className="border border-gray-300 p-4">FatturaPA via SDI</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-4 font-medium">Germany</td>
-                <td className="border border-gray-300 p-4">Must accept e‑invoices</td>
-                <td className="border border-gray-300 p-4">January 2025</td>
-                <td className="border border-gray-300 p-4">XRechnung via Peppol</td>
+                <td className="border border-gray-300 p-4">Must receive e‑invoices; issuing phased</td>
+                <td className="border border-gray-300 p-4">Receive: Jan 2025, Issue: 2027–2028</td>
+                <td className="border border-gray-300 p-4">XRechnung/ZUGFeRD via Peppol</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-4 font-medium">France</td>
-                <td className="border border-gray-300 p-4">Receiving mandatory</td>
+                <td className="border border-gray-300 p-4">Receiving mandatory; issuing phased</td>
                 <td className="border border-gray-300 p-4">September 2026</td>
                 <td className="border border-gray-300 p-4">Factur‑X via PPF/PDP</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-4 font-medium">Poland</td>
-                <td className="border border-gray-300 p-4">KSeF e‑invoicing platform</td>
-                <td className="border border-gray-300 p-4">July 2026</td>
+                <td className="border border-gray-300 p-4">KSeF mandatory (phased)</td>
+                <td className="border border-gray-300 p-4">Feb 1, 2026 (large), Apr 1, 2026 (others)</td>
                 <td className="border border-gray-300 p-4">UBL 2.1 via KSeF</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-4 font-medium">Spain</td>
-                <td className="border border-gray-300 p-4">B2B e‑invoicing mandatory</td>
-                <td className="border border-gray-300 p-4">2025 (phased)</td>
-                <td className="border border-gray-300 p-4">Facturae via SII</td>
+                <td className="border border-gray-300 p-4">B2B e‑invoicing planned (phased)</td>
+                <td className="border border-gray-300 p-4">From 2026 (pending regs)</td>
+                <td className="border border-gray-300 p-4">Facturae; SII remains VAT reporting</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="border border-gray-300 p-4 font-medium">Netherlands</td>
-                <td className="border border-gray-300 p-4">Government contracts first</td>
-                <td className="border border-gray-300 p-4">2026 (planned)</td>
-                <td className="border border-gray-300 p-4">UBL 2.1 via Peppol</td>
+                <td className="border border-gray-300 p-4">B2G mandatory since 2017; no B2B mandate yet</td>
+                <td className="border border-gray-300 p-4">Since 2017</td>
+                <td className="border border-gray-300 p-4">UBL / Peppol; B2B under consultation</td>
               </tr>
             </tbody>
           </table>

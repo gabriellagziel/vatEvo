@@ -31,7 +31,7 @@ export default function Compare() {
       stripeTax: false,
       avalara: false,
       sovos: "partial",
-      pagero: true,
+      pagero: "needs verification",
     },
     {
       feature: "EN16931 / UBL 2.1 validation",
@@ -66,10 +66,10 @@ export default function Compare() {
       pagero: "limited",
     },
     {
-      feature: "10-year WORM archiving",
+      feature: "10-Year WORM archiving",
       vatevo: true,
       stripeTax: false,
-      avalara: "paid",
+      avalara: "paid add-on",
       sovos: "missing",
       pagero: "missing",
     },
@@ -187,11 +187,11 @@ export default function Compare() {
             Stripe Tax Limitations
           </h3>
           <ul className="text-yellow-800 space-y-2 text-sm">
-            <li>• No e-invoicing submission</li>
-            <li>• Tax calculation only</li>
-            <li>• No EU gateway integrations</li>
-            <li>• No compliance archiving</li>
-            <li>• Not built for multi-tenant SaaS</li>
+            <li>• ❌ No e-invoicing submission</li>
+            <li>• ✅ VAT calculation only</li>
+            <li>• ❌ No EU gateway integrations (SDI, Peppol, KSeF, PPF)</li>
+            <li>• ❌ No compliance archiving</li>
+            <li>• ❌ Not designed for multi-tenant SaaS</li>
           </ul>
         </div>
 
@@ -200,11 +200,11 @@ export default function Compare() {
             Enterprise Solutions
           </h3>
           <ul className="text-orange-800 space-y-2 text-sm">
-            <li>• Complex implementation (6+ months)</li>
-            <li>• Enterprise pricing only</li>
-            <li>• Heavy integration requirements</li>
+            <li>• Complex implementation (<strong>6+ months typical</strong>)</li>
+            <li>• Enterprise-level pricing only</li>
+            <li>• Heavy custom integration requirements</li>
             <li>• Not optimized for SaaS workflows</li>
-            <li>• Limited API-first approach</li>
+            <li>• Limited API-first capabilities</li>
           </ul>
         </div>
       </div>

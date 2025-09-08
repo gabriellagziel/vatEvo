@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://vatevo-marketing.vercel.app";
+  const baseUrl = "https://vatevo.com";
   const pages = ["", "/vida", "/solutions", "/compare", "/demo", "/contact"];
   const lastModified = new Date().toISOString();
   
