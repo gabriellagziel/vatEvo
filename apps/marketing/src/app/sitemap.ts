@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://vatevo-marketing.vercel.app";
   const pages = ["", "/vida", "/solutions", "/compare", "/demo", "/contact"];
