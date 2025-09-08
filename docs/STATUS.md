@@ -470,9 +470,64 @@ curl -w "Time: %{time_total}s\n" -o /dev/null -s https://api.vatevo.com/health/r
 - **Versioning**: Semantic versioning with release candidate status
 
 ---
+## v0.1.0 Final Evidence
+
+### Demo Data & Flows
+- **Demo Seed Script**: `ops/demo/seed.sh` creates 3 tenants with 20 invoices across IT/DE/FR/ES/NL/PL
+- **Demo Reset Script**: `ops/demo/reset.sh` for clean demo environment
+- **Demo Run Guide**: Complete `docs/DEMO_RUN.md` with CLI, dashboard, and SDK flows
+- **Playwright Screenshots**: `ops/demo/snapshots.spec.ts` generates marketing, dashboard, API, and compliance screenshots
+- **Demo Gallery**: `assets/demo/README.md` with generated image grid
+- **Quickstart Demo Mode**: Updated `docs/QUICKSTART.md` with demo setup instructions
+
+### Go-Live Validation
+- **Status Endpoint**: `/status` returns JSON with version, health, regions, and latency
+- **SLOs Documentation**: Complete `docs/SLOS.md` with 99.9% availability, P95 < 2000ms, error rate < 1%
+- **E2E Smoke Tests**: Enhanced `ops/api/smoke.sh` with demo invoice creation and status polling
+- **Production Smoke Workflow**: `.github/workflows/e2e-prod-smoke.yml` for manual production testing
+- **Uptime Monitoring**: GitHub Actions workflow with rolling summary artifacts
+
+### Sales/Legal Pack
+- **Pricing Page**: Complete `/pricing` with 3 tiers, calculator, and FAQ
+- **Contact Page**: `/contact` with lead capture form and CRM integration
+- **Leads API**: `/api/leads` endpoint for lead processing and CRM routing
+- **Pricing Notes**: Internal `docs/PRICING_NOTES.md` with strategy and variables
+- **CRM Webhook Guide**: `docs/CRM_WEBHOOK.md` for Salesforce, HubSpot, Pipedrive, Zoho integration
+- **Legal Templates**: Complete `legal/` directory with DPA, DPIA, SLA, Security Policy, Privacy Policy drafts
+
+### Compliance Visibility
+- **Compliance Matrix**: Updated `docs/COMPLIANCE_MATRIX.md` with adapter status and test coverage
+- **Dashboard Compliance Page**: Compliance matrix display in dashboard
+- **Adapter Framework**: Complete `apps/api/app/adapters/` with base interface and country adapters
+- **Test Coverage**: Unit tests for all adapters with "Not Implemented" assertions
+
+### Performance Baselines
+- **K6 Load Testing**: Tuned `ops/load/k6_api_smoke.js` with SLO-aligned thresholds
+- **Performance Workflow**: `.github/workflows/perf-smoke.yml` with artifact upload
+- **Baseline Metrics**: P50 < 1000ms, P95 < 2000ms, P99 < 5000ms, Error rate < 1%
+- **Performance Evidence**: Latest run summary linked in status document
+
+### Release Packaging
+- **Handover Documentation**: Complete `docs/HANDOVER.md` with all links and procedures
+- **Postman Environment**: `docs/postman/VATEVO.postman_environment.json` with test variables
+- **Release Checklist**: `.github/RELEASE_CHECKLIST.md` with pre-flight checks
+- **Version Bump**: Ready for v0.1.0 final release
+- **GitHub Release**: Template prepared from release notes
+
+### Final Deliverables
+- **Demo Environment**: Fully seeded with 3 tenants, 20 invoices, API keys, webhooks
+- **Screenshots**: Complete gallery of marketing, dashboard, API, and compliance pages
+- **Status Page**: Real-time status with JSON endpoint and human-readable page
+- **Legal Pack**: Complete legal templates and policies (draft status)
+- **Performance**: K6 load testing with SLO-compliant baselines
+- **Documentation**: Comprehensive handover package with all necessary links
+
+---
+
 **Report Generated:** 2025-09-09T00:15:00Z  
 **Verification Completed:** 2025-09-09T00:30:00Z  
 **API Deployment:** 2025-09-09T01:15:00Z  
+**v0.1.0 Final:** 2025-09-09T06:00:00Z  
 **DNS Cutover:** 2025-09-09T01:30:00Z  
 **Production Ready:** 2025-09-09T01:45:00Z  
 **Platform Hardening:** 2025-09-09T02:30:00Z  

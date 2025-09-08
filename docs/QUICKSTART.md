@@ -317,6 +317,65 @@ for (const invoice of failedInvoices) {
 }
 ```
 
+## Demo Mode
+
+For quick testing and demonstrations, you can use our demo data:
+
+### 1. Start Demo Environment
+```bash
+# Start API server
+cd apps/api
+python -m uvicorn app.main:app --reload
+
+# Start dashboard (in another terminal)
+cd apps/dashboard
+npm run dev
+
+# Start marketing site (in another terminal)
+cd apps/marketing
+npm run dev
+```
+
+### 2. Seed Demo Data
+```bash
+# Run demo data seeding script
+./ops/demo/seed.sh
+
+# This creates:
+# - 3 demo tenants (SMB, Marketplace, Enterprise)
+# - 3 API keys (one per tenant)
+# - 20 demo invoices across multiple countries
+# - Webhook endpoints configured
+```
+
+### 3. Test with Demo Data
+```bash
+# Use the generated API keys from the seed script output
+# Example:
+curl -H "Authorization: Bearer vatevo_demo_smb_key_123" \
+     http://localhost:8000/invoices
+
+# Or use the dashboard at http://localhost:3000
+# Login with demo credentials and explore the interface
+```
+
+### 4. Reset Demo Data
+```bash
+# Reset demo data when done
+./ops/demo/reset.sh
+```
+
+### 5. Run Automated Screenshots
+```bash
+# Install Playwright
+npm install -D @playwright/test
+
+# Run screenshot generation
+npx playwright test ops/demo/snapshots.spec.ts
+
+# View generated screenshots in assets/demo/
+```
+
 ---
 
 **Ready to start?** [Get your API key](https://vatevo.com) and follow the steps above!
