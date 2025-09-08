@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ devin/bootstrap ]
+    branches: [ main, devin/bootstrap ]
 
 jobs:
   backend:
