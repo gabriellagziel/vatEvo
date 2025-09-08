@@ -15,12 +15,15 @@
 - [ ] **Issuer Validation**: Verify JWT issuer
 
 ### API Key Management
-- [ ] **Key Generation**: Use cryptographically secure random keys
-- [ ] **Key Storage**: Hash API keys in database
-- [ ] **Key Rotation**: Implement key rotation mechanism
-- [ ] **Key Revocation**: Allow immediate key revocation
-- [ ] **Rate Limiting**: Implement per-key rate limiting
-- [ ] **Audit Logging**: Log all API key usage
+- [x] **Key Generation**: Use cryptographically secure random keys
+- [x] **Key Storage**: Hash API keys in database
+- [x] **Key Rotation**: Implement key rotation mechanism
+- [x] **Key Revocation**: Allow immediate key revocation
+- [x] **Rate Limiting**: Implement per-tenant rate limiting
+- [x] **Audit Logging**: Log all API key usage
+- [x] **Expiration**: Support key expiration dates
+- [x] **Named Keys**: Support descriptive key names
+- [x] **Usage Tracking**: Track last used timestamps
 
 ### Multi-tenant Isolation
 - [ ] **Tenant Validation**: Verify tenant_id in all requests

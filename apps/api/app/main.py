@@ -17,6 +17,7 @@ from .auth import get_current_tenant
 from .compliance import validate_invoice_data, generate_ubl_xml
 from .config import settings
 from .webhooks import WebhookSigner, WebhookDelivery, create_webhook_event
+from .rate_limiting import ApiKeyManager, get_tenant_from_api_key
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -394,3 +395,70 @@ async def test_webhook_delivery(
         "webhook_url": current_tenant.webhook_url,
         "event": webhook_event
     }
+
+
+# API Key Management endpoints
+@app.post("/api-keys")
+async def create_api_key(
+    name: str,
+    expires_days: Optional[int] = None,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Create a new API key for the current tenant"""
+    expires_at = None
+    if expires_days:
+        expires_at = datetime.utcnow() + timedelta(days=expires_days)
+    
+    key_data = ApiKeyManager.create_api_key(
+        db, current_tenant.id, name, expires_at
+    )
+    
+    return key_data
+
+
+@app.get("/api-keys")
+async def list_api_keys(
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """List API keys for the current tenant"""
+    keys = ApiKeyManager.list_api_keys(db, current_tenant.id)
+    return {"api_keys": keys}
+
+
+@app.delete("/api-keys/{key_id}")
+async def revoke_api_key(
+    key_id: str,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Revoke an API key"""
+    success = ApiKeyManager.revoke_api_key(db, current_tenant.id, key_id)
+    
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="API key not found"
+        )
+    
+    return {"message": "API key revoked successfully"}
+
+
+@app.post("/api-keys/{key_id}/rotate")
+async def rotate_api_key(
+    key_id: str,
+    current_tenant: Tenant = Depends(get_current_tenant),
+    db: Session = Depends(get_db)
+):
+    """Rotate an API key (create new, revoke old)"""
+    try:
+        new_key_data = ApiKeyManager.rotate_api_key(db, current_tenant.id, key_id)
+        return new_key_data
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to rotate API key: {str(e)}"
+        )

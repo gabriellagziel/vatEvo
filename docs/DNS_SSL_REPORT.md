@@ -86,6 +86,32 @@ vatevo.com           CAA    0 issue "vercel.com"
 3. **Redirect Test**: Verify www redirects work correctly
 4. **Performance**: Check Core Web Vitals scores
 
+## Docs Subdomain Binding
+
+### 1. Connect docs.vatevo.com
+1. **Go to Vercel Dashboard** → Project `vat-evo-marketing` → Settings → Domains
+2. **Add Domain**: Click "Add Domain" and enter `docs.vatevo.com`
+3. **Configure Routing**: Set up routing to serve docs content
+4. **SSL Certificate**: Vercel will automatically provision SSL certificate
+
+### 2. Configure Docs Routing
+1. **Build Settings**: Ensure docs build command is `npm run build`
+2. **Output Directory**: Set to `apps/docs/build`
+3. **Root Directory**: Set to `apps/docs`
+4. **Environment Variables**: Configure any required env vars
+
+### 3. Verify Docs Deployment
+1. **DNS Resolution**: `dig docs.vatevo.com` should return Vercel IPs
+2. **HTTPS Access**: `curl -I https://docs.vatevo.com` should return 200 OK
+3. **Content Loading**: Verify all documentation pages load correctly
+4. **API Reference**: Test embedded OpenAPI documentation
+
+### 4. Docs Subdomain DNS Record
+```
+# Add to registrar DNS
+docs.vatevo.com       CNAME  cname.vercel-dns.com
+```
+
 ### 2. Fly.io Domain (API)
 
 **Fly.io Configuration Required:**

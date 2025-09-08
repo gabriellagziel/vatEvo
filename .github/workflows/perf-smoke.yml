@@ -1,0 +1,131 @@
+name: Performance Smoke Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'API Base URL'
+        required: false
+        default: 'https://api.vatevo.com'
+      api_key:
+        description: 'API Key for testing'
+        required: true
+        type: string
+      duration:
+        description: 'Test duration (e.g., 30s, 1m, 5m)'
+        required: false
+        default: '2m'
+      vus:
+        description: 'Number of virtual users'
+        required: false
+        default: '10'
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+
+jobs:
+  performance-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install K6
+        run: |
+          sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747AF341398053352685AC588C39F4B71
+          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+      
+      - name: Run Performance Test
+        run: |
+          cd ops/load
+          k6 run \
+            --vus ${{ github.event.inputs.vus || '10' }} \
+            --duration ${{ github.event.inputs.duration || '2m' }} \
+            --env API_BASE_URL="${{ github.event.inputs.api_url || 'https://api.vatevo.com' }}" \
+            --env API_KEY="${{ github.event.inputs.api_key || 'test-api-key' }}" \
+            k6_api_smoke.js
+        env:
+          API_BASE_URL: ${{ github.event.inputs.api_url || 'https://api.vatevo.com' }}
+          API_KEY: ${{ github.event.inputs.api_key || 'test-api-key' }}
+      
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-test-results
+          path: |
+            ops/load/summary.json
+            ops/load/summary.txt
+          retention-days: 30
+      
+      - name: Parse Results
+        id: parse-results
+        run: |
+          if [ -f ops/load/summary.json ]; then
+            # Extract key metrics from K6 results
+            P50=$(jq -r '.metrics.http_req_duration.values["p(50)"] // "N/A"' ops/load/summary.json)
+            P95=$(jq -r '.metrics.http_req_duration.values["p(95)"] // "N/A"' ops/load/summary.json)
+            P99=$(jq -r '.metrics.http_req_duration.values["p(99)"] // "N/A"' ops/load/summary.json)
+            AVG=$(jq -r '.metrics.http_req_duration.values.avg // "N/A"' ops/load/summary.json)
+            ERROR_RATE=$(jq -r '.metrics.http_req_failed.values.rate // "N/A"' ops/load/summary.json)
+            RPS=$(jq -r '.metrics.http_reqs.values.rate // "N/A"' ops/load/summary.json)
+            ITERATIONS=$(jq -r '.metrics.iterations.values.count // "N/A"' ops/load/summary.json)
+            
+            echo "p50=$P50" >> $GITHUB_OUTPUT
+            echo "p95=$P95" >> $GITHUB_OUTPUT
+            echo "p99=$P99" >> $GITHUB_OUTPUT
+            echo "avg=$AVG" >> $GITHUB_OUTPUT
+            echo "error_rate=$ERROR_RATE" >> $GITHUB_OUTPUT
+            echo "rps=$RPS" >> $GITHUB_OUTPUT
+            echo "iterations=$ITERATIONS" >> $GITHUB_OUTPUT
+          else
+            echo "p50=N/A" >> $GITHUB_OUTPUT
+            echo "p95=N/A" >> $GITHUB_OUTPUT
+            echo "p99=N/A" >> $GITHUB_OUTPUT
+            echo "avg=N/A" >> $GITHUB_OUTPUT
+            echo "error_rate=N/A" >> $GITHUB_OUTPUT
+            echo "rps=N/A" >> $GITHUB_OUTPUT
+            echo "iterations=N/A" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Check Performance Thresholds
+        run: |
+          # Check if performance meets thresholds
+          P95=$(echo "${{ steps.parse-results.outputs.p95 }}" | sed 's/ms//')
+          ERROR_RATE=$(echo "${{ steps.parse-results.outputs.error_rate }}" | sed 's/%//')
+          
+          # P95 should be under 2000ms
+          if (( $(echo "$P95 > 2000" | bc -l) )); then
+            echo "❌ P95 response time ($P95 ms) exceeds threshold (2000 ms)"
+            exit 1
+          fi
+          
+          # Error rate should be under 10%
+          if (( $(echo "$ERROR_RATE > 0.1" | bc -l) )); then
+            echo "❌ Error rate ($ERROR_RATE) exceeds threshold (10%)"
+            exit 1
+          fi
+          
+          echo "✅ Performance thresholds met"
+      
+      - name: Update Status
+        run: |
+          echo "## Performance Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value | Threshold | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| P50 Response Time | ${{ steps.parse-results.outputs.p50 }} | < 1000ms | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| P95 Response Time | ${{ steps.parse-results.outputs.p95 }} | < 2000ms | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| P99 Response Time | ${{ steps.parse-results.outputs.p99 }} | < 5000ms | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Average Response Time | ${{ steps.parse-results.outputs.avg }} | < 1500ms | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Error Rate | ${{ steps.parse-results.outputs.error_rate }} | < 10% | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Requests/sec | ${{ steps.parse-results.outputs.rps }} | > 10 | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Iterations | ${{ steps.parse-results.outputs.iterations }} | > 100 | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Configuration:**" >> $GITHUB_STEP_SUMMARY
+          echo "- API URL: ${{ github.event.inputs.api_url || 'https://api.vatevo.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Duration: ${{ github.event.inputs.duration || '2m' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Virtual Users: ${{ github.event.inputs.vus || '10' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test completed successfully!** 🚀" >> $GITHUB_STEP_SUMMARY

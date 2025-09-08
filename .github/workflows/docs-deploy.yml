@@ -1,0 +1,177 @@
+name: Docs Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/docs/**'
+      - 'docs/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/docs/**'
+      - 'docs/**'
+  workflow_dispatch:
+
+env:
+  VERCEL_ORG_ID: team_E06jYKBd0fLuTP9d98TgkmDB
+  VERCEL_PROJECT_ID: prj_MRCZDXWDTRRTyRRfHJ5ornncrIFv
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/docs
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/docs/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build documentation
+        run: npm run build
+      
+      - name: Check for broken links
+        run: |
+          # Install link checker
+          npm install -g @docusaurus/linkchecker
+          
+          # Check for broken links
+          npx @docusaurus/linkchecker build --verbose
+
+  deploy-preview:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Build Project Artifacts
+        run: |
+          cd apps/docs
+          npm ci
+          npm run build
+      
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+      
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Documentation preview')
+            );
+            
+            const previewUrl = process.env.VERCEL_URL || 'https://docs-preview.vatevo.com';
+            
+            const body = `## 📚 Documentation Preview
+            
+            Your documentation changes have been deployed to a preview environment:
+            
+            **Preview URL:** ${previewUrl}
+            
+            ### Changes in this PR:
+            - Documentation updates
+            - API reference updates
+            - Content improvements
+            
+            ### Next Steps:
+            1. Review the preview URL
+            2. Check for any broken links or formatting issues
+            3. Request changes if needed
+            4. Approve and merge when ready
+            
+            ---
+            *This comment will be updated on subsequent pushes to this PR.*`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+  deploy-production:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+      
+      - name: Build Project Artifacts
+        run: |
+          cd apps/docs
+          npm ci
+          npm run build
+      
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+      
+      - name: Verify deployment
+        run: |
+          # Wait for deployment to be ready
+          sleep 30
+          
+          # Test documentation site
+          curl -f https://docs.vatevo.com || exit 1
+          
+          echo "✅ Documentation deployment successful"
+          echo "Production URL: https://docs.vatevo.com"
+      
+      - name: Update status
+        run: |
+          echo "## Documentation Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ Production | https://docs.vatevo.com |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment completed successfully**" >> $GITHUB_STEP_SUMMARY

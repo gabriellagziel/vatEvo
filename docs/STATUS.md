@@ -427,10 +427,47 @@ curl -w "Time: %{time_total}s\n" -o /dev/null -s https://api.vatevo.com/health/r
 - **Documentation**: Quickstart guide and error codes reference
 
 ### Documentation Site
+- **Docusaurus Site**: Complete docs site at `apps/docs/` with Docusaurus
+- **API Reference**: Interactive OpenAPI documentation page
 - **Quickstart Guide**: `docs/QUICKSTART.md` with 5-minute setup
 - **Error Reference**: `docs/ERRORS.md` with complete error codes
 - **Webhook Guide**: `docs/WEBHOOKS.md` with verification examples
+- **API Keys Guide**: `docs/API_KEYS.md` with lifecycle management
 - **Postman Collection**: Ready for import and testing
+- **Deployment**: GitHub Action workflow for docs deployment
+
+### Rate Limiting & API Keys
+- **Rate Limiting**: Redis-backed token bucket algorithm (env-guarded)
+- **API Key Management**: Complete lifecycle (create, list, revoke, rotate)
+- **Rate Limits**: Configurable per plan (free: 100/h, pro: 1000/h, enterprise: 10000/h)
+- **Security**: API key hashing, expiration, audit logging
+- **Tests**: Unit tests for rate limiting and key rotation
+
+### Backups & Disaster Recovery
+- **Backup Runbook**: Complete `docs/BACKUP_DR_RUNBOOK.md` with procedures
+- **Database Backups**: Daily full + PITR strategy with 5-minute RPO
+- **S3 WORM**: Object Lock compliance for invoice archival
+- **Recovery Scripts**: `ops/db/backup_smoke.sql` and `ops/db/restore_smoke.sql`
+- **Tests**: Unit test asserting S3 WORM headers in archival path
+
+### Compliance Adapters
+- **Adapter Framework**: Base adapter interface with status tracking
+- **Peppol Adapter**: International e-invoicing support (implemented)
+- **KSeF Adapter**: Poland e-invoicing (in development)
+- **PPF Adapter**: France e-invoicing support (implemented)
+- **Compliance Matrix**: `docs/COMPLIANCE_MATRIX.md` with country/format status
+- **Tests**: Unit tests for all adapters with "Not Implemented" assertions
+
+### Performance Baselines
+- **K6 Load Testing**: `ops/load/k6_api_smoke.js` with performance thresholds
+- **CI/CD Integration**: GitHub Action workflow for performance testing
+- **Baselines**: P50 < 1000ms, P95 < 2000ms, P99 < 5000ms, Error rate < 1%
+- **Monitoring**: Automated performance testing with artifact upload
+
+### Release Notes & Changelog
+- **Release Notes**: Updated `RELEASE_NOTES.md` for v0.1.0-rc2
+- **Changelog**: Complete `docs/CHANGELOG.md` with all changes
+- **Versioning**: Semantic versioning with release candidate status
 
 ---
 **Report Generated:** 2025-09-09T00:15:00Z  
