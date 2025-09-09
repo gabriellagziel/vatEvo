@@ -1,17 +1,32 @@
 Uptime Monitoring - Latest Run
 ===============================
 Workflow: .github/workflows/uptime.yml
-Status: Not yet triggered (manual dispatch required)
+Status: Updated to check working endpoints
 Last Check: 2025-01-27T12:00:00Z
 
 Endpoints Monitored:
-- https://api.vatevo.com/health/ready (DNS not configured)
-- https://api.vatevo.com/health/db (DNS not configured)  
-- https://vatevo.com/vida (DNS not configured)
-- https://dashboard.vatevo.com (DNS not configured)
+- https://app-ezgnqzzi.fly.dev/healthz (API health)
+- https://app-ezgnqzzi.fly.dev/docs (API documentation)
+- https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app (Marketing site)
+- https://vatevo.com/vida (Custom domain - DNS not configured)
 
-Alternative Working Endpoints:
-- https://app-ezgnqzzi.fly.dev/healthz (Status: 200)
-- https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app (Status: 200)
+Manual Test Results:
+===================
+✅ API /healthz: 200 OK (1.289s)
+✅ API /docs: 200 OK (0.358s)
+⚠️  Marketing Site: 401 Unauthorized (requires auth bypass)
+❌ Custom Domain /vida: Points to Squarespace (DNS not configured)
 
-Note: Custom domains not yet configured, using Fly.io and Vercel URLs
+Workflow Status:
+===============
+- Workflow updated to check working endpoints
+- Manual trigger attempted but workflow not yet available
+- Will run automatically every 5 minutes once available
+- Custom domains will be added after DNS cutover
+
+Next Steps:
+===========
+1. Wait for workflow to be available on GitHub
+2. Configure DNS for custom domains
+3. Update workflow to check custom domains
+4. Verify all endpoints return 200 OK

@@ -307,9 +307,9 @@ curl https://docs.vatevo.com
 ### v0.1.0 Final Release
 - **Tag Name**: `v0.1.0`
 - **Release Date**: 2025-01-27T12:00:00Z
-- **Commit SHA**: `d154f67`
+- **Commit SHA**: `cade95f`
 - **Status**: Investor Demo Ready
-- **GitHub Release**: [Draft Release Template](.github/RELEASE_DRAFT_v0.1.0.md)
+- **GitHub Release**: [https://github.com/gabriellagziel/vatEvo/releases/tag/untagged-6d5991b4492f94797a10](https://github.com/gabriellagziel/vatEvo/releases/tag/untagged-6d5991b4492f94797a10)
 
 ### Release Assets
 - **Investor Demo Kit**: [`dist/investor_demo_kit_v0.1.0.zip`](../dist/investor_demo_kit_v0.1.0.zip) (87KB)
@@ -320,7 +320,9 @@ curl https://docs.vatevo.com
 ### Status Page URLs
 - **API Health**: https://app-ezgnqzzi.fly.dev/healthz
 - **API Documentation**: https://app-ezgnqzzi.fly.dev/docs
+- **API Status**: https://app-ezgnqzzi.fly.dev/status (404 - not deployed)
 - **Marketing Site**: https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app
+- **Marketing Status**: https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app/status
 - **Dashboard**: https://dashboard.vatevo.com (DNS pending)
 - **Main Site**: https://vatevo.com (DNS pending)
 - **Docs Site**: https://docs.vatevo.com (DNS pending)
