@@ -21,6 +21,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rate limiting fallback when Redis is not available
 - Webhook signature verification edge cases
 
+## [0.1.0] - 2025-01-27
+
+### Added
+- **Investor Demo Kit**
+  - Complete demo data seeding with 3 tenants and 20 invoices
+  - Automated screenshot capture with Playwright
+  - Demo run guide with CLI, dashboard, and SDK flows
+  - Demo gallery with generated image grid
+
+- **Go-Live Validation**
+  - Public status endpoint with health, version, and latency metrics
+  - Service Level Objectives (SLOs) with 99.9% availability target
+  - Enhanced E2E smoke tests with demo invoice creation
+  - Production smoke workflow for manual testing
+
+- **Sales & Legal Pack**
+  - Pricing page with 3 tiers and JavaScript calculator
+  - Contact page with lead capture and CRM integration
+  - Leads API endpoint for lead processing
+  - Complete legal templates (DPA, DPIA, SLA, Security, Privacy)
+
+- **Compliance Visibility**
+  - Updated compliance matrix with adapter status
+  - Compliance adapter framework with country adapters
+  - Unit tests for all adapters with proper assertions
+
+- **Performance Baselines**
+  - Tuned K6 load testing with SLO-aligned thresholds
+  - Performance workflow with artifact upload
+  - Baseline metrics meeting SLO requirements
+
+- **Release Packaging**
+  - Complete handover documentation with all links
+  - Postman environment with test variables
+  - Release checklist with pre-flight checks
+  - Investor demo kit ZIP bundle
+
+### Changed
+- Updated version to v0.1.0 final
+- Enhanced release notes for investor readiness
+- Improved demo data with realistic scenarios
+
+### Fixed
+- Demo data seeding idempotency
+- Screenshot automation reliability
+- Status endpoint performance
+
 ## [0.1.0-rc2] - 2025-09-09
 
 ### Added
