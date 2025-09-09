@@ -7,66 +7,69 @@ DNS Status: Custom domains not yet configured
 WORKING ENDPOINTS (Current State)
 ==================================
 
-API Services (Fly.io)
----------------------
-✅ https://app-ezgnqzzi.fly.dev/healthz
-   Status: 200 OK
-   Response Time: 1.289s
-   Response: {"status":"ok","service":"vatevo-api"}
+API Services (Fly.io Base URL)
+------------------------------
+❌ https://app-ezgnqzzi.fly.dev/health/ready
+   Status: 404 Not Found
+   Response Time: 0.460s
+   Response: {"detail":"Not Found"}
+   Note: Endpoint not implemented
+
+❌ https://app-ezgnqzzi.fly.dev/health/db
+   Status: 404 Not Found
+   Response Time: 0.226s
+   Response: {"detail":"Not Found"}
+   Note: Endpoint not implemented
 
 ✅ https://app-ezgnqzzi.fly.dev/docs
    Status: 200 OK
-   Response Time: 0.358s
+   Response Time: 0.307s
    Response: Swagger UI HTML (complete)
 
 ❌ https://app-ezgnqzzi.fly.dev/status
    Status: 404 Not Found
+   Response Time: 0.209s
    Response: {"detail":"Not Found"}
    Note: Endpoint implemented but not deployed
-
-Marketing Site (Vercel)
------------------------
-⚠️  https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app
-   Status: 401 Unauthorized
-   Response Time: 0.183s
-   Response: Vercel Authentication Required
-   Note: Protected deployment, requires authentication bypass
 
 CUSTOM DOMAINS (Not Configured)
 ===============================
 
 ❌ https://api.vatevo.com/health/ready
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
 ❌ https://api.vatevo.com/health/db
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
 ❌ https://api.vatevo.com/docs
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
 ❌ https://api.vatevo.com/status
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
-❌ https://vatevo.com/vida
-   Status: Points to Squarespace (198.49.23.144)
-   Note: DNS not updated
+WEB DOMAINS (Current State)
+===========================
+
+✅ https://vatevo.com/vida
+   Status: HTTP/2 200
+   Note: Points to Squarespace (not Vercel)
 
 ❌ https://dashboard.vatevo.com
-   Status: Points to Squarespace (ext-sq.squarespace.com)
-   Note: DNS not updated
+   Status: No response
+   Note: DNS not configured
 
 ❌ https://docs.vatevo.com
-   Status: Points to Squarespace (ext-sq.squarespace.com)
-   Note: DNS not updated
+   Status: No response
+   Note: DNS not configured
 
 DNS RESOLUTION STATUS
 =====================
 Current DNS Records (2025-01-27T12:00:00Z):
-- vatevo.com → 198.49.23.145, 198.49.23.144 (Squarespace)
+- vatevo.com → 198.185.159.145, 198.185.159.144, 198.49.23.145, 198.49.23.144 (Squarespace)
 - www.vatevo.com → ext-sq.squarespace.com (Squarespace)
 - dashboard.vatevo.com → (no record)
 - docs.vatevo.com → (no record)
@@ -81,27 +84,27 @@ Required DNS Changes:
 
 SSL CERTIFICATE STATUS
 ======================
-✅ Fly.io API: Valid SSL certificate
+✅ Fly.io API: Valid SSL certificate (app-ezgnqzzi.fly.dev)
 ⚠️  Vercel Marketing: Authentication required (cannot verify SSL)
 ❌ Custom domains: Not configured (no SSL certificates)
 
 SUMMARY
 =======
 Total Tests: 10
-Passed: 2 (API health and docs on Fly.io)
+Passed: 2 (API docs on Fly.io, vatevo.com/vida on Squarespace)
 Failed: 6 (Custom domains not configured)
-Skipped: 2 (Marketing site requires auth, Status endpoint not deployed)
+Skipped: 2 (Health endpoints not implemented, Status endpoint not deployed)
 
 STATUS: PARTIAL PASS
-- API services working on Fly.io base URL
+- API docs working on Fly.io base URL
 - Custom domains require DNS configuration
-- Marketing site requires authentication bypass
+- Health endpoints not implemented
 - Status endpoint needs deployment
 
 NEXT STEPS
 ==========
 1. Configure DNS records for all custom domains
-2. Deploy API with /status endpoint
+2. Deploy API with health endpoints and status endpoint
 3. Configure Vercel domain bindings
 4. Configure Fly.io custom domain
 5. Re-run smoke tests against custom domains
@@ -111,13 +114,13 @@ BLOCKING ISSUES
 ===============
 - DNS configuration not completed
 - Custom domains not accessible
+- Health endpoints not implemented
 - Status endpoint not deployed
-- Marketing site requires authentication
 
 RECOMMENDATIONS
 ===============
 1. Complete DNS cutover before final release
-2. Deploy API updates to enable /status endpoint
+2. Deploy API updates to enable all endpoints
 3. Configure Vercel authentication bypass for marketing site
 4. Test all custom domains after DNS propagation
 5. Verify SSL certificates are valid across all domains

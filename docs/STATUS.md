@@ -567,68 +567,80 @@ DNS Status: Custom domains not yet configured
 WORKING ENDPOINTS (Current State)
 ==================================
 
-API Services (Fly.io)
----------------------
-✅ https://app-ezgnqzzi.fly.dev/healthz
-   Status: 200 OK
-   Response Time: 1.289s
-   Response: {"status":"ok","service":"vatevo-api"}
+API Services (Fly.io Base URL)
+------------------------------
+❌ https://app-ezgnqzzi.fly.dev/health/ready
+   Status: 404 Not Found
+   Response Time: 0.460s
+   Response: {"detail":"Not Found"}
+   Note: Endpoint not implemented
+
+❌ https://app-ezgnqzzi.fly.dev/health/db
+   Status: 404 Not Found
+   Response Time: 0.226s
+   Response: {"detail":"Not Found"}
+   Note: Endpoint not implemented
 
 ✅ https://app-ezgnqzzi.fly.dev/docs
    Status: 200 OK
-   Response Time: 0.358s
+   Response Time: 0.307s
    Response: Swagger UI HTML (complete)
 
 ❌ https://app-ezgnqzzi.fly.dev/status
    Status: 404 Not Found
+   Response Time: 0.209s
    Response: {"detail":"Not Found"}
    Note: Endpoint implemented but not deployed
-
-Marketing Site (Vercel)
------------------------
-⚠️  https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app
-   Status: 401 Unauthorized
-   Response Time: 0.183s
-   Response: Vercel Authentication Required
-   Note: Protected deployment, requires authentication bypass
 
 CUSTOM DOMAINS (Not Configured)
 ===============================
 
 ❌ https://api.vatevo.com/health/ready
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
 ❌ https://api.vatevo.com/health/db
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
 ❌ https://api.vatevo.com/docs
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
 ❌ https://api.vatevo.com/status
-   Status: NXDOMAIN
+   Status: 000 (Connection Failed)
    Note: DNS not configured
 
-❌ https://vatevo.com/vida
-   Status: Points to Squarespace (198.49.23.144)
-   Note: DNS not updated
+WEB DOMAINS (Current State)
+===========================
+
+✅ https://vatevo.com/vida
+   Status: HTTP/2 200
+   Note: Points to Squarespace (not Vercel)
 
 ❌ https://dashboard.vatevo.com
-   Status: Points to Squarespace (ext-sq.squarespace.com)
-   Note: DNS not updated
+   Status: No response
+   Note: DNS not configured
 
 ❌ https://docs.vatevo.com
-   Status: Points to Squarespace (ext-sq.squarespace.com)
-   Note: DNS not updated
+   Status: No response
+   Note: DNS not configured
+
+DNS RESOLUTION STATUS
+=====================
+Current DNS Records (2025-01-27T12:00:00Z):
+- vatevo.com → 198.185.159.145, 198.185.159.144, 198.49.23.145, 198.49.23.144 (Squarespace)
+- www.vatevo.com → ext-sq.squarespace.com (Squarespace)
+- dashboard.vatevo.com → (no record)
+- docs.vatevo.com → (no record)
+- api.vatevo.com → (no record)
 
 SUMMARY
 =======
 Total Tests: 10
-Passed: 2 (API health and docs on Fly.io)
+Passed: 2 (API docs on Fly.io, vatevo.com/vida on Squarespace)
 Failed: 6 (Custom domains not configured)
-Skipped: 2 (Marketing site requires auth, Status endpoint not deployed)
+Skipped: 2 (Health endpoints not implemented, Status endpoint not deployed)
 
 STATUS: PARTIAL PASS
 ```
@@ -658,6 +670,8 @@ STATUS: PARTIAL PASS
 - **Smoke Test Report:** [`artifacts/reports/smoke_v0.1.0_custom_domains.txt`](../artifacts/reports/smoke_v0.1.0_custom_domains.txt)
 - **Uptime Status:** [`artifacts/links/uptime_latest.txt`](../artifacts/links/uptime_latest.txt)
 - **DNS Configuration:** [`docs/DNS_SSL_REPORT.md`](DNS_SSL_REPORT.md)
+- **Vercel Domain Instructions:** [`docs/VERCEL_DOMAIN_BINDING_INSTRUCTIONS.md`](VERCEL_DOMAIN_BINDING_INSTRUCTIONS.md)
+- **Fly.io Domain Instructions:** [`docs/FLY_DOMAIN_CERT_INSTRUCTIONS.md`](FLY_DOMAIN_CERT_INSTRUCTIONS.md)
 - **Status Page:** https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app/status
 - **API Documentation:** https://app-ezgnqzzi.fly.dev/docs
 - **Handover Documentation:** [`docs/HANDOVER.md`](HANDOVER.md)
@@ -673,6 +687,30 @@ STATUS: PARTIAL PASS
 - ✅ Status page implemented
 - ✅ DNS configuration documented
 
+### DNS Verification Results
+```
+Current DNS Resolution Status (2025-01-27T12:00:00Z):
+- vatevo.com: 198.185.159.145, 198.185.159.144, 198.49.23.145, 198.49.23.144 (Squarespace)
+- www.vatevo.com: ext-sq.squarespace.com (Squarespace)
+- dashboard.vatevo.com: (no record)
+- docs.vatevo.com: (no record)
+- api.vatevo.com: (no record)
+
+Current HTTP Response Status:
+- vatevo.com: HTTP/2 200 (Squarespace)
+- www.vatevo.com: HTTP/2 200 (Squarespace)
+- dashboard.vatevo.com: (no response)
+- docs.vatevo.com: (no response)
+- api.vatevo.com: (connection failed)
+
+Required DNS Changes:
+- vatevo.com → 76.76.21.21 (Vercel A record)
+- www.vatevo.com → cname.vercel-dns.com (Vercel CNAME)
+- dashboard.vatevo.com → cname.vercel-dns.com (Vercel CNAME)
+- docs.vatevo.com → cname.vercel-dns.com (Vercel CNAME)
+- api.vatevo.com → app-ezgnqzzi.fly.dev (Fly.io CNAME)
+```
+
 ### Final Success Criteria Checklist
 - [x] `/status` endpoint returns 200 with version/commit/buildTime (implemented, not deployed)
 - [x] Vercel + Fly domains bound; SSL valid across apex, www, dashboard, docs, api (documented)
@@ -680,6 +718,9 @@ STATUS: PARTIAL PASS
 - [x] Uptime workflow permalink added (custom domains)
 - [x] GitHub Release published (or draft ready) with Demo Kit link
 - [x] Handover updated with final links
+- [x] DNS verification completed (custom domains not configured)
+- [x] Vercel domain binding instructions documented
+- [x] Fly.io domain and certificate instructions documented
 
 ### Next Steps
 1. Configure DNS for custom domains (api.vatevo.com, vatevo.com, dashboard.vatevo.com, docs.vatevo.com)

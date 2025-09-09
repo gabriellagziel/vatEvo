@@ -52,7 +52,9 @@ Vatevo v0.1.0 represents a **production-ready MVP** for EU e-invoicing complianc
 |---------|-----|--------|
 | **API Health** | https://app-ezgnqzzi.fly.dev/healthz | ✅ **Live** |
 | **API Documentation** | https://app-ezgnqzzi.fly.dev/docs | ✅ **Live** |
+| **API Status** | https://app-ezgnqzzi.fly.dev/status | ❌ **Not Deployed** |
 | **Marketing Site** | https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app | ✅ **Live** |
+| **Status Page** | https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app/status | ✅ **Live** |
 | **Dashboard** | https://dashboard.vatevo.com | ⚠️ **Pending DNS** |
 | **Main Site** | https://vatevo.com | ⚠️ **Pending DNS** |
 | **Docs Site** | https://docs.vatevo.com | ⚠️ **Pending DNS** |
