@@ -43,7 +43,9 @@ if settings.sentry_dsn:
     except ImportError:
         logger.warning("Sentry SDK not installed, skipping initialization")
 
-Base.metadata.create_all(bind=engine)
+# Only create tables in production, not during tests
+if settings.environment != "test":
+    Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Vatevo API",
