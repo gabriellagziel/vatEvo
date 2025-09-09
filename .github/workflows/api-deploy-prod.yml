@@ -10,7 +10,7 @@ on:
       - ".github/workflows/api-deploy-prod.yml"
 
 env:
-  FLY_APP: vatevo-api
+  FLY_APP: app-ezgnqzzi
 
 jobs:
   deploy_prod:
