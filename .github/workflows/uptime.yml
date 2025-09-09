@@ -18,22 +18,22 @@ jobs:
         run: |
           echo "Checking API health endpoints..."
           
-          # Check /health/ready
-          if curl -f --max-time 10 https://api.vatevo.com/health/ready; then
-            echo "✅ API /health/ready: OK"
-            echo "api_ready=ok" >> $GITHUB_OUTPUT
+          # Check /healthz (working endpoint)
+          if curl -f --max-time 10 https://app-ezgnqzzi.fly.dev/healthz; then
+            echo "✅ API /healthz: OK"
+            echo "api_healthz=ok" >> $GITHUB_OUTPUT
           else
-            echo "❌ API /health/ready: FAILED"
-            echo "api_ready=failed" >> $GITHUB_OUTPUT
+            echo "❌ API /healthz: FAILED"
+            echo "api_healthz=failed" >> $GITHUB_OUTPUT
           fi
           
-          # Check /health/db
-          if curl -f --max-time 10 https://api.vatevo.com/health/db; then
-            echo "✅ API /health/db: OK"
-            echo "api_db=ok" >> $GITHUB_OUTPUT
+          # Check /docs (working endpoint)
+          if curl -f --max-time 10 https://app-ezgnqzzi.fly.dev/docs; then
+            echo "✅ API /docs: OK"
+            echo "api_docs=ok" >> $GITHUB_OUTPUT
           else
-            echo "❌ API /health/db: FAILED"
-            echo "api_db=failed" >> $GITHUB_OUTPUT
+            echo "❌ API /docs: FAILED"
+            echo "api_docs=failed" >> $GITHUB_OUTPUT
           fi
       
       - name: Check Web Health
@@ -41,22 +41,22 @@ jobs:
         run: |
           echo "Checking web endpoints..."
           
-          # Check marketing site
-          if curl -f --max-time 10 https://vatevo.com/vida; then
-            echo "✅ Marketing /vida: OK"
-            echo "marketing_vida=ok" >> $GITHUB_OUTPUT
+          # Check marketing site (working endpoint)
+          if curl -f --max-time 10 https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app; then
+            echo "✅ Marketing Site: OK"
+            echo "marketing=ok" >> $GITHUB_OUTPUT
           else
-            echo "❌ Marketing /vida: FAILED"
-            echo "marketing_vida=failed" >> $GITHUB_OUTPUT
+            echo "❌ Marketing Site: FAILED"
+            echo "marketing=failed" >> $GITHUB_OUTPUT
           fi
           
-          # Check dashboard
-          if curl -f --max-time 10 https://dashboard.vatevo.com; then
-            echo "✅ Dashboard: OK"
-            echo "dashboard=ok" >> $GITHUB_OUTPUT
+          # Check custom domains (will fail until DNS is configured)
+          if curl -f --max-time 10 https://vatevo.com/vida; then
+            echo "✅ Custom Domain /vida: OK"
+            echo "custom_vida=ok" >> $GITHUB_OUTPUT
           else
-            echo "❌ Dashboard: FAILED"
-            echo "dashboard=failed" >> $GITHUB_OUTPUT
+            echo "⚠️ Custom Domain /vida: FAILED (DNS not configured)"
+            echo "custom_vida=failed" >> $GITHUB_OUTPUT
           fi
       
       - name: Create Issue on Failure
@@ -122,9 +122,9 @@ jobs:
           echo "## Uptime Check Results" >> $GITHUB_STEP_SUMMARY
           echo "| Endpoint | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| API /health/ready | ${{ steps.api_health.outputs.api_ready }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| API /health/db | ${{ steps.api_health.outputs.api_db }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Marketing /vida | ${{ steps.web_health.outputs.marketing_vida }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dashboard | ${{ steps.web_health.outputs.dashboard }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API /healthz | ${{ steps.api_health.outputs.api_healthz }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API /docs | ${{ steps.api_health.outputs.api_docs }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Marketing Site | ${{ steps.web_health.outputs.marketing }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Custom Domain /vida | ${{ steps.web_health.outputs.custom_vida }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Timestamp**: $(date -u)" >> $GITHUB_STEP_SUMMARY

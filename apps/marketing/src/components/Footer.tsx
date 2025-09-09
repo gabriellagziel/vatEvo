@@ -44,6 +44,7 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Contact</h4>
             <ul className="space-y-2 text-gray-400">
               <li><Link href="/contact" className="hover:text-white">Request Demo</Link></li>
+              <li><Link href="/status" className="hover:text-white">Status</Link></li>
               <li><a href="mailto:contact@vatevo.com" className="hover:text-white">contact@vatevo.com</a></li>
             </ul>
           </div>

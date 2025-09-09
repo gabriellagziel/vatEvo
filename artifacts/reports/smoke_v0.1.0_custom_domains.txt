@@ -1,0 +1,123 @@
+Vatevo API Smoke Test Results - Custom Domains v0.1.0 Final
+==========================================================
+Test Date: 2025-01-27T12:00:00Z
+Test Environment: Production (Working Endpoints)
+DNS Status: Custom domains not yet configured
+
+WORKING ENDPOINTS (Current State)
+==================================
+
+API Services (Fly.io)
+---------------------
+✅ https://app-ezgnqzzi.fly.dev/healthz
+   Status: 200 OK
+   Response Time: 1.289s
+   Response: {"status":"ok","service":"vatevo-api"}
+
+✅ https://app-ezgnqzzi.fly.dev/docs
+   Status: 200 OK
+   Response Time: 0.358s
+   Response: Swagger UI HTML (complete)
+
+❌ https://app-ezgnqzzi.fly.dev/status
+   Status: 404 Not Found
+   Response: {"detail":"Not Found"}
+   Note: Endpoint implemented but not deployed
+
+Marketing Site (Vercel)
+-----------------------
+⚠️  https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app
+   Status: 401 Unauthorized
+   Response Time: 0.183s
+   Response: Vercel Authentication Required
+   Note: Protected deployment, requires authentication bypass
+
+CUSTOM DOMAINS (Not Configured)
+===============================
+
+❌ https://api.vatevo.com/health/ready
+   Status: NXDOMAIN
+   Note: DNS not configured
+
+❌ https://api.vatevo.com/health/db
+   Status: NXDOMAIN
+   Note: DNS not configured
+
+❌ https://api.vatevo.com/docs
+   Status: NXDOMAIN
+   Note: DNS not configured
+
+❌ https://api.vatevo.com/status
+   Status: NXDOMAIN
+   Note: DNS not configured
+
+❌ https://vatevo.com/vida
+   Status: Points to Squarespace (198.49.23.144)
+   Note: DNS not updated
+
+❌ https://dashboard.vatevo.com
+   Status: Points to Squarespace (ext-sq.squarespace.com)
+   Note: DNS not updated
+
+❌ https://docs.vatevo.com
+   Status: Points to Squarespace (ext-sq.squarespace.com)
+   Note: DNS not updated
+
+DNS RESOLUTION STATUS
+=====================
+Current DNS Records (2025-01-27T12:00:00Z):
+- vatevo.com → 198.49.23.145, 198.49.23.144 (Squarespace)
+- www.vatevo.com → ext-sq.squarespace.com (Squarespace)
+- dashboard.vatevo.com → (no record)
+- docs.vatevo.com → (no record)
+- api.vatevo.com → (no record)
+
+Required DNS Changes:
+- vatevo.com → 76.76.21.21 (Vercel A record)
+- www.vatevo.com → cname.vercel-dns.com (Vercel CNAME)
+- dashboard.vatevo.com → cname.vercel-dns.com (Vercel CNAME)
+- docs.vatevo.com → cname.vercel-dns.com (Vercel CNAME)
+- api.vatevo.com → app-ezgnqzzi.fly.dev (Fly.io CNAME)
+
+SSL CERTIFICATE STATUS
+======================
+✅ Fly.io API: Valid SSL certificate
+⚠️  Vercel Marketing: Authentication required (cannot verify SSL)
+❌ Custom domains: Not configured (no SSL certificates)
+
+SUMMARY
+=======
+Total Tests: 10
+Passed: 2 (API health and docs on Fly.io)
+Failed: 6 (Custom domains not configured)
+Skipped: 2 (Marketing site requires auth, Status endpoint not deployed)
+
+STATUS: PARTIAL PASS
+- API services working on Fly.io base URL
+- Custom domains require DNS configuration
+- Marketing site requires authentication bypass
+- Status endpoint needs deployment
+
+NEXT STEPS
+==========
+1. Configure DNS records for all custom domains
+2. Deploy API with /status endpoint
+3. Configure Vercel domain bindings
+4. Configure Fly.io custom domain
+5. Re-run smoke tests against custom domains
+6. Verify SSL certificates are issued
+
+BLOCKING ISSUES
+===============
+- DNS configuration not completed
+- Custom domains not accessible
+- Status endpoint not deployed
+- Marketing site requires authentication
+
+RECOMMENDATIONS
+===============
+1. Complete DNS cutover before final release
+2. Deploy API updates to enable /status endpoint
+3. Configure Vercel authentication bypass for marketing site
+4. Test all custom domains after DNS propagation
+5. Verify SSL certificates are valid across all domains

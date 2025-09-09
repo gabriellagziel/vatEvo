@@ -261,6 +261,50 @@ https://api.vatevo.com/healthz → 200 OK (API health)
 - [ ] SSL handshake < 200ms
 - [ ] Page load < 2 seconds
 
+## Final Records
+
+### Current DNS Status (2025-01-27T12:00:00Z)
+```bash
+# Current resolution (still pointing to Squarespace)
+vatevo.com           → 198.49.23.144, 198.49.23.145 (Squarespace)
+www.vatevo.com       → ext-sq.squarespace.com (Squarespace)
+dashboard.vatevo.com → ext-sq.squarespace.com (Squarespace)
+docs.vatevo.com      → ext-sq.squarespace.com (Squarespace)
+api.vatevo.com       → NXDOMAIN (Not configured)
+```
+
+### Required DNS Changes
+```bash
+# 1. Vercel Marketing Site (Apex + WWW)
+vatevo.com           A      76.76.21.21
+www.vatevo.com       CNAME  cname.vercel-dns.com
+
+# 2. Vercel Dashboard
+dashboard.vatevo.com CNAME  cname.vercel-dns.com
+
+# 3. Vercel Docs Site  
+docs.vatevo.com      CNAME  cname.vercel-dns.com
+
+# 4. Fly.io API
+api.vatevo.com       CNAME  app-ezgnqzzi.fly.dev
+```
+
+### Vercel Domain Configuration Steps
+1. **Login to Vercel Dashboard**
+2. **Navigate to each project**:
+   - Marketing: `vat-evo-marketing` → Domains → Add `vatevo.com`, `www.vatevo.com`
+   - Dashboard: `vat-evo-dashboard` → Domains → Add `dashboard.vatevo.com`
+   - Docs: `vat-evo-docs` → Domains → Add `docs.vatevo.com`
+3. **Verify DNS records** shown in Vercel UI
+4. **Wait for SSL certificates** to be issued (5-10 minutes)
+
+### Fly.io Domain Configuration Steps
+1. **Login to Fly.io Dashboard**
+2. **Navigate to app**: `app-ezgnqzzi`
+3. **Go to Settings → Domains**
+4. **Add domain**: `api.vatevo.com`
+5. **Verify CNAME record** points to `app-ezgnqzzi.fly.dev`
+
 ---
 
 **Next Action**: Update DNS records at registrar and configure Vercel/Fly.io domains  
