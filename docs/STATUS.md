@@ -561,13 +561,13 @@ curl -w "Time: %{time_total}s\n" -o /dev/null -s https://api.vatevo.com/health/r
 Status: 404 Not Found
 Response: {"detail":"Not Found"}
 Note: Endpoint implemented but not deployed
-Expected: {"version":"0.1.0","commit":"6c15333","buildTime":"2025-01-27T12:00:00Z","regions":["eu-fra"],"api":{"live":true,"ready":true,"db":true},"latencyMs":{"p50":null,"p95":null}}
+Expected: {"version":"0.1.0","commit":"a3131ad","buildTime":"2025-01-27T12:00:00Z","regions":["eu-fra"],"api":{"live":true,"ready":true,"db":true},"latencyMs":{"p50":null,"p95":null}}
 ```
 
 ### DNS/SSL Evidence
 ```
 DNS Resolution Check:
-- vatevo.com: 198.49.23.145, 198.49.23.144, 198.185.159.145, 198.185.159.144 (Squarespace)
+- vatevo.com: 198.49.23.144, 198.49.23.145, 198.185.159.145, 198.185.159.144 (Squarespace)
 - www.vatevo.com: ext-sq.squarespace.com (Squarespace)
 - dashboard.vatevo.com: (no record)
 - docs.vatevo.com: (no record)
@@ -720,6 +720,9 @@ Required DNS Changes:
 - [x] DNS verification completed (custom domains not configured)
 - [x] Vercel domain binding instructions documented
 - [x] Fly.io domain and certificate instructions documented
+- [x] Build stamps implemented in Dockerfile and workflow
+- [x] API /status endpoint implemented with proper JSON structure
+- [x] Comprehensive smoke test report generated
 
 ### Next Steps
 1. Configure DNS for custom domains (api.vatevo.com, vatevo.com, dashboard.vatevo.com, docs.vatevo.com)
