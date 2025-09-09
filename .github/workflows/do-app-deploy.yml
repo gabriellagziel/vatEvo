@@ -1,0 +1,65 @@
+name: API → DigitalOcean App Platform (prod)
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - "apps/api/**"
+      - ".do/app.yaml"
+      - ".github/workflows/do-app-deploy.yml"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Ensure App exists or create it
+        id: ensure
+        shell: bash
+        run: |
+          set -euo pipefail
+          if doctl apps list --format "Spec.Name,ID" | awk '$1=="vatevo-api"{print $2}' | grep -q .; then
+            APP_ID=$(doctl apps list --format "Spec.Name,ID" | awk '$1=="vatevo-api"{print $2; exit}')
+            echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
+            echo "Updating app $APP_ID from spec..."
+            doctl apps update $APP_ID --spec .do/app.yaml >/tmp/do-update.json
+            cat /tmp/do-update.json
+          else
+            echo "Creating app from spec..."
+            doctl apps create --spec .do/app.yaml >/tmp/do-create.json
+            cat /tmp/do-create.json
+            APP_ID=$(jq -r '.id' /tmp/do-create.json)
+            echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Wait for deployment to be active
+        id: wait
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP_ID="${{ steps.ensure.outputs.app_id }}"
+          echo "Waiting for app $APP_ID to become active..."
+          for i in {1..60}; do
+            STATUS=$(doctl apps get $APP_ID --output json | jq -r '.[0].active_deployment.phase')
+            HOST=$(doctl apps get $APP_ID --output json | jq -r '.[0].default_ingress')
+            echo "Phase: $STATUS | Host: $HOST"
+            if [ "$STATUS" = "ACTIVE" ] && [ -n "$HOST" ] && curl -ksf "https://$HOST/status" >/dev/null; then
+              echo "host=$HOST" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "App did not become active in time" >&2
+          doctl apps get $APP_ID --output json | jq .
+          exit 1
+
+      - name: Show status JSON
+        run: |
+          HOST="${{ steps.wait.outputs.host }}"
+          echo "API host: https://$HOST"
+          curl -fsS "https://$HOST/status" | jq .
