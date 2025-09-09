@@ -1,6 +1,6 @@
 # Vatevo — Online Status (Production Demo)
 
-**Last Updated (Europe/Rome):** _fill on run_  
+**Last Updated (Europe/Rome):** _fill when run_  
 **Commit:** `_fill_`  
 **Build Time (UTC):** `_fill_`
 
@@ -27,15 +27,6 @@
 * dashboard → CNAME cname.vercel-dns.com
 * docs → CNAME cname.vercel-dns.com
 * api → CNAME app-ezgnqzzi.fly.dev
-
-## Checklist
-
-* [ ] API `/status` returns 200 + `status:"ok"`
-* [ ] `vatevo.com` online (200)
-* [ ] `dashboard.vatevo.com` online (200)
-* [ ] `docs.vatevo.com` online (200)
-* [ ] `api.vatevo.com/status` online (200 + JSON)
-* [ ] HTTPS valid on all subdomains
 
 # Vatevo Project - Complete Technical Status Report
 
