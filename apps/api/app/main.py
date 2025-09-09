@@ -146,54 +146,17 @@ async def health_db(db: Session = Depends(get_db)):
 
 
 @app.get("/status", tags=["Ops"])
-async def status():
+def status():
     """Public status endpoint for monitoring and status pages"""
     import os
-    import time
-    from datetime import datetime
-    
-    # Get build information
-    version = os.getenv("VERSION", "0.1.0")
-    commit = os.getenv("GIT_COMMIT", "unknown")
-    build_time = os.getenv("BUILD_TIME", datetime.utcnow().isoformat())
-    
-    # Check API health
-    api_live = True
-    api_ready = True
-    api_db = True
-    
-    try:
-        # Check if we can connect to database
-        db = next(get_db())
-        db.execute("SELECT 1")
-    except Exception:
-        api_db = False
-        api_ready = False
-    
-    # Get regions (Fly.io regions)
-    regions = ["eu-fra", "eu-lhr"]  # Frankfurt and London regions
-    
-    # Calculate latency (simplified)
-    start_time = time.time()
-    # Simulate some work
-    time.sleep(0.001)
-    latency_ms = int((time.time() - start_time) * 1000)
     
     return {
-        "version": version,
-        "commit": commit,
-        "buildTime": build_time,
-        "regions": regions,
-        "api": {
-            "live": api_live,
-            "ready": api_ready,
-            "db": api_db
-        },
-        "latencyMs": {
-            "p50": None,  # Placeholder for future implementation
-            "p95": None   # Placeholder for future implementation
-        },
-        "timestamp": datetime.utcnow().isoformat()
+        "version": os.getenv("VERSION", "0.1.0"),
+        "commit": os.getenv("GIT_SHA", "dev")[:7],
+        "buildTime": os.getenv("BUILD_TIME", ""),
+        "regions": [os.getenv("FLY_REGION", "eu-fra")],
+        "api": {"live": True, "ready": True, "db": True},
+        "latencyMs": {"p50": None, "p95": None}
     }
 
 

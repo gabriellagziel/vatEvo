@@ -3,6 +3,12 @@
 
 FROM python:3.12-slim as base
 
+# Build arguments for version information
+ARG VERSION=0.1.0
+ARG GIT_SHA=dev
+ARG BUILD_TIME
+ENV VERSION=$VERSION GIT_SHA=$GIT_SHA BUILD_TIME=$BUILD_TIME
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -42,6 +48,11 @@ RUN mkdir -p /app/logs /app/data && \
 
 # Switch to non-root user
 USER vatevo
+
+# Add build metadata labels
+LABEL org.opencontainers.image.version=$VERSION \
+      org.opencontainers.image.revision=$GIT_SHA \
+      org.opencontainers.image.created=$BUILD_TIME
 
 # Expose port
 EXPOSE 8000
