@@ -37,6 +37,7 @@ class Tenant(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     invoices = relationship("Invoice", back_populates="tenant")
+    api_keys = relationship("ApiKey", back_populates="tenant")
 
 
 class Invoice(Base):
@@ -92,3 +93,17 @@ class WebhookEvent(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     invoice = relationship("Invoice", back_populates="webhook_events")
+
+
+class ApiKey(Base):
+    __tablename__ = "api_keys"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    key_hash = Column(String(255), unique=True, index=True, nullable=False)
+    name = Column(String(100), nullable=False)
+    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    last_used_at = Column(DateTime(timezone=True), nullable=True)
+    
+    tenant = relationship("Tenant", back_populates="api_keys")
