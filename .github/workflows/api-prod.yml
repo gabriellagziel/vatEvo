@@ -35,45 +35,8 @@ jobs:
             --build-arg APP_ENV=production \
             --remote-only
 
-      - name: Verify /status
-        run: curl -fsS https://app-ezgnqzzi.fly.dev/status | jq .
-
-name: API → Fly.io (prod)
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main ]
-    paths:
-      - "apps/api/**"
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build metadata
-        id: meta
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "build_time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
-
-      - name: Setup flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy to Fly
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        run: |
-          flyctl deploy \
-            --config apps/api/fly.toml \
-            --build-arg GIT_SHA=${{ steps.meta.outputs.sha_short }} \
-            --build-arg BUILD_TIME=${{ steps.meta.outputs.build_time }} \
-            --build-arg APP_VERSION=0.1.0 \
-            --build-arg APP_ENV=production \
-            --remote-only
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Verify /status
         run: curl -fsS https://app-ezgnqzzi.fly.dev/status | jq .
