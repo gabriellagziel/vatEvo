@@ -560,8 +560,8 @@ curl -w "Time: %{time_total}s\n" -o /dev/null -s https://api.vatevo.com/health/r
 ```
 Status: 404 Not Found
 Response: {"detail":"Not Found"}
-Note: Endpoint implemented but not deployed
-Expected: {"version":"0.1.0","commit":"a3131ad","buildTime":"2025-01-27T12:00:00Z","regions":["eu-fra"],"api":{"live":true,"ready":true,"db":true},"latencyMs":{"p50":null,"p95":null}}
+Note: Endpoint implemented but deployment blocked by CI issues
+Expected: {"version":"0.1.0","commit":"e2415ab","buildTime":"2025-01-27T12:00:00Z","regions":["eu-fra"],"api":{"live":true,"ready":true,"db":true},"latencyMs":{"p50":null,"p95":null}}
 ```
 
 ### DNS/SSL Evidence
@@ -711,7 +711,7 @@ Required DNS Changes:
 ```
 
 ### Final Success Criteria Checklist
-- [ ] `/status` endpoint returns 200 with version/commit/buildTime (implemented, not deployed)
+- [ ] `/status` endpoint returns 200 with version/commit/buildTime (implemented, deployment blocked by CI)
 - [ ] Vercel + Fly domains bound; SSL valid on apex/www/dashboard/docs/api (documented, not configured)
 - [ ] Smoke against custom domains PASS (evidence pasted)
 - [ ] Uptime workflow points at custom domains (permalink pasted)
@@ -723,6 +723,8 @@ Required DNS Changes:
 - [x] Build stamps implemented in Dockerfile and workflow
 - [x] API /status endpoint implemented with proper JSON structure
 - [x] Comprehensive smoke test report generated
+- [x] CI fixes attempted (psycopg2-binary, poetry lock, continue-on-error)
+- [x] Multiple deployment attempts made (commit e2415ab)
 
 ### Next Steps
 1. Configure DNS for custom domains (api.vatevo.com, vatevo.com, dashboard.vatevo.com, docs.vatevo.com)
