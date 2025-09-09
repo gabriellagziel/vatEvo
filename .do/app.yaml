@@ -2,11 +2,7 @@ name: vatevo-api
 region: ams3
 services:
   - name: api
-    github:
-      repo: gabriellagziel/vatEvo
-      branch: main
-      deploy_on_push: true
-    source_dir: apps/api
+    dockerfile_path: apps/api/Dockerfile
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
