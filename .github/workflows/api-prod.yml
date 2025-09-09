@@ -1,18 +1,22 @@
 name: API → Fly.io (prod)
+
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
     paths:
       - "apps/api/**"
+      - ".github/workflows/api-prod.yml"   # allow workflow edits to trigger
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    permissions: { contents: read }
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Build metadata
         id: meta
@@ -24,9 +28,9 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy to Fly
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        env: { FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }} }
         run: |
+          set -euo pipefail
           flyctl deploy \
             --config apps/api/fly.toml \
             --build-arg GIT_SHA=${{ steps.meta.outputs.sha_short }} \
@@ -35,10 +39,27 @@ jobs:
             --build-arg APP_ENV=production \
             --remote-only
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Wait for /status (retry up to 5 min)
+        run: |
+          set -euo pipefail
+          URL="https://app-ezgnqzzi.fly.dev/status"
+          end=$((SECONDS+300))
+          until [ $SECONDS -ge $end ]; do
+            code=$(curl -ks -o /dev/null -w "%{http_code}" "$URL")
+            if [ "$code" = "200" ]; then
+              curl -fsS "$URL" | jq .
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Timed out waiting for $URL" >&2
+          exit 1
 
-      - name: Verify /status
-        run: curl -fsS https://app-ezgnqzzi.fly.dev/status | jq .
+      - name: Show Fly status on failure
+        if: failure()
+        env: { FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }} }
+        run: |
+          flyctl status -a app-ezgnqzzi || true
+          flyctl logs   -a app-ezgnqzzi --since 15m || true
 
 
