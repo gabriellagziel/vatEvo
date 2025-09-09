@@ -11,24 +11,24 @@ API Services (Fly.io Base URL)
 ------------------------------
 ❌ https://app-ezgnqzzi.fly.dev/health/ready
    Status: 404 Not Found
-   Response Time: 0.460s
+   Response Time: 0.233s
    Response: {"detail":"Not Found"}
    Note: Endpoint not implemented
 
 ❌ https://app-ezgnqzzi.fly.dev/health/db
    Status: 404 Not Found
-   Response Time: 0.226s
+   Response Time: 0.397s
    Response: {"detail":"Not Found"}
    Note: Endpoint not implemented
 
 ✅ https://app-ezgnqzzi.fly.dev/docs
    Status: 200 OK
-   Response Time: 0.307s
+   Response Time: 0.204s
    Response: Swagger UI HTML (complete)
 
 ❌ https://app-ezgnqzzi.fly.dev/status
    Status: 404 Not Found
-   Response Time: 0.209s
+   Response Time: 0.296s
    Response: {"detail":"Not Found"}
    Note: Endpoint implemented but not deployed
 
@@ -51,25 +51,10 @@ CUSTOM DOMAINS (Not Configured)
    Status: 000 (Connection Failed)
    Note: DNS not configured
 
-WEB DOMAINS (Current State)
-===========================
-
-✅ https://vatevo.com/vida
-   Status: HTTP/2 200
-   Note: Points to Squarespace (not Vercel)
-
-❌ https://dashboard.vatevo.com
-   Status: No response
-   Note: DNS not configured
-
-❌ https://docs.vatevo.com
-   Status: No response
-   Note: DNS not configured
-
 DNS RESOLUTION STATUS
 =====================
 Current DNS Records (2025-01-27T12:00:00Z):
-- vatevo.com → 198.185.159.145, 198.185.159.144, 198.49.23.145, 198.49.23.144 (Squarespace)
+- vatevo.com → 198.49.23.145, 198.49.23.144, 198.185.159.145, 198.185.159.144 (Squarespace)
 - www.vatevo.com → ext-sq.squarespace.com (Squarespace)
 - dashboard.vatevo.com → (no record)
 - docs.vatevo.com → (no record)
@@ -85,15 +70,13 @@ Required DNS Changes:
 SSL CERTIFICATE STATUS
 ======================
 ✅ Fly.io API: Valid SSL certificate (app-ezgnqzzi.fly.dev)
-⚠️  Vercel Marketing: Authentication required (cannot verify SSL)
 ❌ Custom domains: Not configured (no SSL certificates)
 
 SUMMARY
 =======
-Total Tests: 10
-Passed: 2 (API docs on Fly.io, vatevo.com/vida on Squarespace)
-Failed: 6 (Custom domains not configured)
-Skipped: 2 (Health endpoints not implemented, Status endpoint not deployed)
+Total Tests: 8
+Passed: 1 (API docs on Fly.io)
+Failed: 7 (Health endpoints not implemented, Status endpoint not deployed, Custom domains not configured)
 
 STATUS: PARTIAL PASS
 - API docs working on Fly.io base URL

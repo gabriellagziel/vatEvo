@@ -556,6 +556,30 @@ curl -w "Time: %{time_total}s\n" -o /dev/null -s https://api.vatevo.com/health/r
 - **Python SDK:** `sdks/python/` (pyproject.toml, README, source)
 - **Examples:** Node/Express and Python/FastAPI integrations
 
+### API /status JSON Sample
+```
+Status: 404 Not Found
+Response: {"detail":"Not Found"}
+Note: Endpoint implemented but not deployed
+Expected: {"version":"0.1.0","commit":"6c15333","buildTime":"2025-01-27T12:00:00Z","regions":["eu-fra"],"api":{"live":true,"ready":true,"db":true},"latencyMs":{"p50":null,"p95":null}}
+```
+
+### DNS/SSL Evidence
+```
+DNS Resolution Check:
+- vatevo.com: 198.49.23.145, 198.49.23.144, 198.185.159.145, 198.185.159.144 (Squarespace)
+- www.vatevo.com: ext-sq.squarespace.com (Squarespace)
+- dashboard.vatevo.com: (no record)
+- docs.vatevo.com: (no record)
+- api.vatevo.com: (no record)
+
+HTTP Response Check:
+- vatevo.com/vida: HTTP/2 200 (Squarespace)
+- dashboard.vatevo.com: Could not resolve host
+- docs.vatevo.com: Could not resolve host
+- api.vatevo.com/status: Could not resolve host
+```
+
 ### Final E2E Smoke Test Results
 ```
 Vatevo API Smoke Test Results - Custom Domains v0.1.0 Final
@@ -571,24 +595,24 @@ API Services (Fly.io Base URL)
 ------------------------------
 ❌ https://app-ezgnqzzi.fly.dev/health/ready
    Status: 404 Not Found
-   Response Time: 0.460s
+   Response Time: 0.233s
    Response: {"detail":"Not Found"}
    Note: Endpoint not implemented
 
 ❌ https://app-ezgnqzzi.fly.dev/health/db
    Status: 404 Not Found
-   Response Time: 0.226s
+   Response Time: 0.397s
    Response: {"detail":"Not Found"}
    Note: Endpoint not implemented
 
 ✅ https://app-ezgnqzzi.fly.dev/docs
    Status: 200 OK
-   Response Time: 0.307s
+   Response Time: 0.204s
    Response: Swagger UI HTML (complete)
 
 ❌ https://app-ezgnqzzi.fly.dev/status
    Status: 404 Not Found
-   Response Time: 0.209s
+   Response Time: 0.296s
    Response: {"detail":"Not Found"}
    Note: Endpoint implemented but not deployed
 
@@ -611,36 +635,11 @@ CUSTOM DOMAINS (Not Configured)
    Status: 000 (Connection Failed)
    Note: DNS not configured
 
-WEB DOMAINS (Current State)
-===========================
-
-✅ https://vatevo.com/vida
-   Status: HTTP/2 200
-   Note: Points to Squarespace (not Vercel)
-
-❌ https://dashboard.vatevo.com
-   Status: No response
-   Note: DNS not configured
-
-❌ https://docs.vatevo.com
-   Status: No response
-   Note: DNS not configured
-
-DNS RESOLUTION STATUS
-=====================
-Current DNS Records (2025-01-27T12:00:00Z):
-- vatevo.com → 198.185.159.145, 198.185.159.144, 198.49.23.145, 198.49.23.144 (Squarespace)
-- www.vatevo.com → ext-sq.squarespace.com (Squarespace)
-- dashboard.vatevo.com → (no record)
-- docs.vatevo.com → (no record)
-- api.vatevo.com → (no record)
-
 SUMMARY
 =======
-Total Tests: 10
-Passed: 2 (API docs on Fly.io, vatevo.com/vida on Squarespace)
-Failed: 6 (Custom domains not configured)
-Skipped: 2 (Health endpoints not implemented, Status endpoint not deployed)
+Total Tests: 8
+Passed: 1 (API docs on Fly.io)
+Failed: 7 (Health endpoints not implemented, Status endpoint not deployed, Custom domains not configured)
 
 STATUS: PARTIAL PASS
 ```
@@ -712,11 +711,11 @@ Required DNS Changes:
 ```
 
 ### Final Success Criteria Checklist
-- [x] `/status` endpoint returns 200 with version/commit/buildTime (implemented, not deployed)
-- [x] Vercel + Fly domains bound; SSL valid across apex, www, dashboard, docs, api (documented)
-- [x] Smoke against custom domains PASS (evidence pasted)
-- [x] Uptime workflow permalink added (custom domains)
-- [x] GitHub Release published (or draft ready) with Demo Kit link
+- [ ] `/status` endpoint returns 200 with version/commit/buildTime (implemented, not deployed)
+- [ ] Vercel + Fly domains bound; SSL valid on apex/www/dashboard/docs/api (documented, not configured)
+- [ ] Smoke against custom domains PASS (evidence pasted)
+- [ ] Uptime workflow points at custom domains (permalink pasted)
+- [x] Release draft updated with final links (Demo Kit, docs, API /docs)
 - [x] Handover updated with final links
 - [x] DNS verification completed (custom domains not configured)
 - [x] Vercel domain binding instructions documented
