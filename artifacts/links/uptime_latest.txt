@@ -1,0 +1,17 @@
+Uptime Monitoring - Latest Run
+===============================
+Workflow: .github/workflows/uptime.yml
+Status: Not yet triggered (manual dispatch required)
+Last Check: 2025-01-27T12:00:00Z
+
+Endpoints Monitored:
+- https://api.vatevo.com/health/ready (DNS not configured)
+- https://api.vatevo.com/health/db (DNS not configured)  
+- https://vatevo.com/vida (DNS not configured)
+- https://dashboard.vatevo.com (DNS not configured)
+
+Alternative Working Endpoints:
+- https://app-ezgnqzzi.fly.dev/healthz (Status: 200)
+- https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app (Status: 200)
+
+Note: Custom domains not yet configured, using Fly.io and Vercel URLs

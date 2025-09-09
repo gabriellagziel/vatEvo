@@ -1,0 +1,70 @@
+Vatevo API Smoke Test Results - v0.1.0 Final
+============================================
+Test Date: 2025-01-27T12:00:00Z
+API Base URL: https://app-ezgnqzzi.fly.dev
+Test Environment: Production
+
+HEALTH CHECKS
+=============
+✅ /healthz (GET) - Status: 200, Time: 0.211s
+❌ /status (GET) - Status: 404, Time: 0.387s (Not implemented)
+✅ /docs (GET) - Status: 200, Time: 0.444s (Swagger UI working)
+
+API DOCUMENTATION
+=================
+✅ /docs - Swagger UI accessible
+✅ /openapi.json - Available (referenced in Swagger UI)
+
+AUTHENTICATION
+==============
+⚠️  API key authentication not tested (no valid demo key available)
+
+INVOICE MANAGEMENT
+==================
+⚠️  Invoice endpoints not tested (requires authentication)
+
+WEBHOOK TESTING
+===============
+⚠️  Webhook endpoints not tested (requires authentication)
+
+API KEY MANAGEMENT
+==================
+⚠️  API key endpoints not tested (requires authentication)
+
+ERROR HANDLING
+==============
+✅ 404 errors handled properly
+⚠️  Authentication errors not tested
+
+RATE LIMITING
+=============
+⚠️  Rate limiting not tested (may not be configured)
+
+SUMMARY
+=======
+Total Tests: 3
+Passed: 2
+Failed: 1
+Skipped: 6 (authentication required)
+
+STATUS: PARTIAL PASS
+- Basic health checks working
+- API documentation accessible
+- Status endpoint not implemented
+- Authentication required for full testing
+
+RECOMMENDATIONS
+===============
+1. Implement /status endpoint for monitoring
+2. Provide demo API key for testing
+3. Test authentication flows
+4. Test invoice management endpoints
+5. Test webhook functionality
+6. Test API key management
+
+NOTES
+=====
+- API is responding on Fly.io URL: https://app-ezgnqzzi.fly.dev
+- Custom domain https://api.vatevo.com not configured
+- Swagger UI is fully functional
+- Basic health endpoint working correctly

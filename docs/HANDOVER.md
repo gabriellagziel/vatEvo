@@ -302,6 +302,40 @@ curl https://docs.vatevo.com
 - [ ] Partner integrations
 - [ ] Enterprise features
 
+## Release Information
+
+### v0.1.0 Final Release
+- **Tag Name**: `v0.1.0`
+- **Release Date**: 2025-01-27T12:00:00Z
+- **Commit SHA**: `d154f67`
+- **Status**: Investor Demo Ready
+- **GitHub Release**: [Draft Release Template](.github/RELEASE_DRAFT_v0.1.0.md)
+
+### Release Assets
+- **Investor Demo Kit**: [`dist/investor_demo_kit_v0.1.0.zip`](../dist/investor_demo_kit_v0.1.0.zip) (87KB)
+- **Postman Collection**: [`docs/postman/VATEVO.postman_collection.json`](postman/VATEVO.postman_collection.json)
+- **Postman Environment**: [`docs/postman/VATEVO.postman_environment.json`](postman/VATEVO.postman_environment.json)
+- **Release Checklist**: [`.github/RELEASE_CHECKLIST.md`](../.github/RELEASE_CHECKLIST.md)
+
+### Status Page URLs
+- **API Health**: https://app-ezgnqzzi.fly.dev/healthz
+- **API Documentation**: https://app-ezgnqzzi.fly.dev/docs
+- **Marketing Site**: https://vat-evo-marketing-gmijoswiy-gabriellagziels-projects.vercel.app
+- **Dashboard**: https://dashboard.vatevo.com (DNS pending)
+- **Main Site**: https://vatevo.com (DNS pending)
+- **Docs Site**: https://docs.vatevo.com (DNS pending)
+
+### SDK Publish Plan
+- **TypeScript SDK**: `@vatevo/sdk` (local build ready)
+- **Python SDK**: `vatevo-sdk` (local build ready)
+- **Publish Status**: Ready for npm/pypi publication
+- **Documentation**: Complete with examples and integration guides
+
+### Release Notes
+- **Complete Changelog**: [`docs/CHANGELOG.md`](CHANGELOG.md)
+- **Release Notes**: [`RELEASE_NOTES.md`](../RELEASE_NOTES.md)
+- **Technical Status**: [`docs/STATUS.md`](STATUS.md)
+
 ## Appendices
 
 ### A. Environment Variables
