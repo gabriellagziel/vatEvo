@@ -1,0 +1,38 @@
+app = "app-ezgnqzzi"
+primary_region = "ams"
+
+[build]
+  dockerfile = "apps/api/Dockerfile"
+
+[env]
+  APP_ENV = "production"
+  APP_VERSION = "0.1.0"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [services.concurrency]
+    type = "requests"
+    soft_limit = 100
+    hard_limit = 200
+
+  [[services.http_checks]]
+    path = "/status"
+    interval = "15s"
+    timeout = "2s"
+    method = "get"
+    protocol = "http"
+
+

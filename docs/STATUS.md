@@ -1,3 +1,42 @@
+# Vatevo — Online Status (Production Demo)
+
+**Last Updated (Europe/Rome):** _fill on run_  
+**Commit:** `_fill_`  
+**Build Time (UTC):** `_fill_`
+
+## API
+- URL: `https://api.vatevo.com/status`
+- Expected: `200 OK` + JSON `{"status":"ok", ...}`
+- Evidence (last run):
+```json
+{ "service":"vatevo-api","env":"production","version":"0.1.0",
+  "commit_sha":"_fill_","build_time":"_fill_","uptime_seconds":42,"status":"ok"
+}
+````
+
+## Frontends
+
+* Marketing: `https://vatevo.com` → 200
+* Dashboard: `https://dashboard.vatevo.com` → 200
+* Docs: `https://docs.vatevo.com` → 200
+
+## DNS (target)
+
+* @ → A 76.76.21.21
+* www → CNAME cname.vercel-dns.com
+* dashboard → CNAME cname.vercel-dns.com
+* docs → CNAME cname.vercel-dns.com
+* api → CNAME app-ezgnqzzi.fly.dev
+
+## Checklist
+
+* [ ] API `/status` returns 200 + `status:"ok"`
+* [ ] `vatevo.com` online (200)
+* [ ] `dashboard.vatevo.com` online (200)
+* [ ] `docs.vatevo.com` online (200)
+* [ ] `api.vatevo.com/status` online (200 + JSON)
+* [ ] HTTPS valid on all subdomains
+
 # Vatevo Project - Complete Technical Status Report
 
 **Generated:** 2025-09-09T00:15:00Z  
