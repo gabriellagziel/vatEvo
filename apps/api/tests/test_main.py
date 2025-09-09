@@ -11,6 +11,33 @@ class TestHealthCheck:
         assert data["status"] == "ok"
         assert data["service"] == "vatevo-api"
 
+    def test_status_endpoint(self, client: TestClient):
+        response = client.get("/status")
+        assert response.status_code == 200
+        data = response.json()
+        
+        # Check required fields
+        assert "version" in data
+        assert "commit" in data
+        assert "buildTime" in data
+        assert "regions" in data
+        assert "api" in data
+        assert "latencyMs" in data
+        assert "timestamp" in data
+        
+        # Check API health structure
+        assert "live" in data["api"]
+        assert "ready" in data["api"]
+        assert "db" in data["api"]
+        
+        # Check latency structure
+        assert "p50" in data["latencyMs"]
+        assert "p95" in data["latencyMs"]
+        
+        # Check regions
+        assert isinstance(data["regions"], list)
+        assert len(data["regions"]) > 0
+
 
 class TestTenantEndpoints:
     def test_create_tenant_success(self, client: TestClient):

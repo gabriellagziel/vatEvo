@@ -145,7 +145,7 @@ async def health_db(db: Session = Depends(get_db)):
         )
 
 
-@app.get("/status")
+@app.get("/status", tags=["Ops"])
 async def status():
     """Public status endpoint for monitoring and status pages"""
     import os
@@ -153,7 +153,7 @@ async def status():
     from datetime import datetime
     
     # Get build information
-    version = os.getenv("VERSION", "1.0.0")
+    version = os.getenv("VERSION", "0.1.0")
     commit = os.getenv("GIT_COMMIT", "unknown")
     build_time = os.getenv("BUILD_TIME", datetime.utcnow().isoformat())
     
@@ -170,12 +170,8 @@ async def status():
         api_db = False
         api_ready = False
     
-    # Check web services (basic connectivity)
-    web_marketing = True  # Assume marketing is up if API is up
-    web_dashboard = True  # Assume dashboard is up if API is up
-    
-    # Get regions
-    regions = ["eu-west-1", "eu-central-1"]  # Default regions
+    # Get regions (Fly.io regions)
+    regions = ["eu-fra", "eu-lhr"]  # Frankfurt and London regions
     
     # Calculate latency (simplified)
     start_time = time.time()
@@ -187,17 +183,16 @@ async def status():
         "version": version,
         "commit": commit,
         "buildTime": build_time,
+        "regions": regions,
         "api": {
             "live": api_live,
             "ready": api_ready,
             "db": api_db
         },
-        "web": {
-            "marketing": web_marketing,
-            "dashboard": web_dashboard
+        "latencyMs": {
+            "p50": None,  # Placeholder for future implementation
+            "p95": None   # Placeholder for future implementation
         },
-        "regions": regions,
-        "latencyMs": latency_ms,
         "timestamp": datetime.utcnow().isoformat()
     }
 
