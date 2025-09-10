@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vatevo Dashboard
+
+The Vatevo Dashboard is a modern, interactive web application built with Next.js 15 and TypeScript that provides a comprehensive interface for managing EU e-invoicing compliance.
+
+## Features
+
+- **Invoice Management**: Create, validate, and track invoices across all EU countries
+- **Real-time Status Updates**: Live webhook integration for instant status changes
+- **Multi-tenant Support**: Secure tenant isolation with API key authentication
+- **Country Adapters**: Support for Italy (FatturaPA), Germany (XRechnung), France (Factur-X)
+- **Compliance Monitoring**: Track submission status and government responses
+- **File Downloads**: Download UBL XML, PDF invoices, and compliance reports
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Icons**: Lucide React
+- **API Integration**: Custom Vatevo API client
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+ 
+- npm, yarn, or pnpm
+- Vatevo API key
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Add your VATEVO_API_KEY to .env.local
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+NEXT_PUBLIC_API_URL=https://api.vatevo.com
+VATEVO_API_KEY=your_api_key_here
+```
 
-## Learn More
+## Available Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run test` - Run Jest tests
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Features Overview
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Invoice Creation
+- Interactive form with real-time validation
+- Support for all EU countries and formats
+- Line item management with tax calculations
+- Supplier and customer information management
 
-## Deploy on Vercel
+### Compliance Tracking
+- Real-time status updates via webhooks
+- Government submission tracking
+- Error handling and retry mechanisms
+- Audit trail and compliance reporting
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Multi-tenant Architecture
+- Secure tenant isolation
+- API key-based authentication
+- Role-based access control
+- Tenant-specific settings and configurations
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Integration
+
+The dashboard integrates with the Vatevo API to provide:
+
+- **Invoice CRUD operations** (Create, Read, Update, Delete)
+- **Real-time webhook processing** for status updates
+- **File generation and download** (UBL XML, PDF)
+- **Compliance validation** and error reporting
+- **Multi-country support** with country-specific adapters
+
+## Deployment
+
+The dashboard is deployed on Vercel with automatic deployments from the main branch.
+
+**Live URL**: [https://dashboard.vatevo.com](https://dashboard.vatevo.com)
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## Support
+
+- **Documentation**: [https://docs.vatevo.com](https://docs.vatevo.com)
+- **API Reference**: [https://api.vatevo.com/docs](https://api.vatevo.com/docs)
+- **Support Email**: [support@vatevo.com](mailto:support@vatevo.com)
+
+## License
+
+MIT License - see [LICENSE](../../LICENSE) for details.
